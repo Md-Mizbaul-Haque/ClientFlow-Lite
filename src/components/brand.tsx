@@ -1,7 +1,7 @@
-"use client";
-
+﻿"use client";
+import { ClientFlowIcon } from "@/components/icons";
 import Link from "next/link";
-import { PanelsTopLeft } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 
 export function Brand({ className }: { className?: string }) {
@@ -20,7 +20,7 @@ export function Brand({ className }: { className?: string }) {
         />
         <span hidden>
           <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg shadow-sm">
-            <PanelsTopLeft className="size-4" />
+            <ClientFlowIcon name="portal" size={16} />
           </span>
         </span>
       </span>

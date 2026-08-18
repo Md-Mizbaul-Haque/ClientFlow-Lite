@@ -1,20 +1,11 @@
 "use client";
+import { ClientFlowIcon } from "@/components/icons";
+import { useParams, useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 import * as React from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import {
-  ArrowLeft,
-  BadgeCheck,
-  Banknote,
-  CheckCircle2,
-  FileSignature,
-  ListChecks,
-  Send,
-  Target,
-  Trash2,
-} from "lucide-react";
+
 import { toast } from "sonner";
 import { useRealtime } from "@/components/use-realtime";
 import { StatusBadge } from "@/components/status-badge";
@@ -99,7 +90,7 @@ export default function AdminProposalDetailPage() {
         <div className="flex items-center gap-3">
           <Button asChild variant="ghost" size="icon">
             <Link href="/admin/proposals">
-              <ArrowLeft className="size-4" />
+              <ClientFlowIcon name="arrow-left" size={16} />
             </Link>
           </Button>
           <div>
@@ -116,11 +107,11 @@ export default function AdminProposalDetailPage() {
           {data.status === "draft" && (
             <>
               <Button variant="outline" onClick={handleDelete}>
-                <Trash2 className="size-4" />
+                <ClientFlowIcon name="trash" size={16} />
                 Delete
               </Button>
               <Button onClick={handleSend}>
-                <Send className="size-4" />
+                <ClientFlowIcon name="send" size={16} />
                 Send to client
               </Button>
             </>
@@ -144,7 +135,7 @@ export default function AdminProposalDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <Target className="text-primary size-4" />
+                <ClientFlowIcon name="target" size={16} className="text-primary" />
                 Scope of work
               </CardTitle>
             </CardHeader>
@@ -163,7 +154,7 @@ export default function AdminProposalDetailPage() {
           <Card>
             <CardHeader className="flex-row items-center justify-between gap-3">
               <CardTitle className="flex items-center gap-2 text-base">
-                <CheckCircle2 className="text-primary size-4" />
+                <ClientFlowIcon name="check-circle" size={16} className="text-primary" />
                 Deliverables
               </CardTitle>
               <span className="text-muted-foreground text-xs font-medium">
@@ -182,7 +173,7 @@ export default function AdminProposalDetailPage() {
                         : "border-border/60 bg-muted/30"
                     }`}
                   >
-                    <BadgeCheck className={done ? "text-emerald-500 size-5 shrink-0" : "text-muted-foreground/30 size-5 shrink-0"} />
+                    <ClientFlowIcon name="approval" className={done ? "text-emerald-500 size-5 shrink-0" : "text-muted-foreground/30 size-5 shrink-0"} />
                     <div className="min-w-0">
                       <p className={done ? "font-medium" : "text-muted-foreground"}>{item.title}</p>
                       {item.description && (
@@ -204,7 +195,7 @@ export default function AdminProposalDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <ListChecks className="text-primary size-4" />
+                  <ClientFlowIcon name="task" size={16} className="text-primary" />
                   Terms
                 </CardTitle>
               </CardHeader>
@@ -226,7 +217,7 @@ export default function AdminProposalDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <Banknote className="text-primary size-4" />
+                <ClientFlowIcon name="banknote" size={16} className="text-primary" />
                 Investment
               </CardTitle>
             </CardHeader>
@@ -243,7 +234,7 @@ export default function AdminProposalDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <FileSignature className="text-primary size-4" />
+                <ClientFlowIcon name="signature" size={16} className="text-primary" />
                 Signature
               </CardTitle>
             </CardHeader>
@@ -279,7 +270,7 @@ export default function AdminProposalDetailPage() {
             <Card className="border-primary/30 bg-primary/[0.04]">
               <CardContent className="flex flex-col gap-3 py-4">
                 <div className="flex items-center gap-2">
-                  <Send className="text-primary size-4" />
+                  <ClientFlowIcon name="send" size={16} className="text-primary" />
                   <p className="font-medium text-sm">Awaiting client action</p>
                 </div>
                 <p className="text-muted-foreground text-sm">

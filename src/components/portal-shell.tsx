@@ -1,13 +1,13 @@
 "use client";
+import { ClientFlowIcon, type IconName } from "@/components/icons";
+import { usePathname, useRouter } from "next/navigation";
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { FileText, FolderKanban, LayoutDashboard, LogOut, Menu, Receipt, Sun } from "lucide-react";
+
 import { toast } from "sonner";
 import { signOut } from "next-auth/react";
 import { Brand } from "@/components/brand";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -21,11 +21,11 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn, initials } from "@/lib/utils";
 
-const NAV = [
-  { href: "/portal", label: "Overview", icon: LayoutDashboard },
-  { href: "/portal/proposals", label: "Proposals", icon: FileText },
-  { href: "/portal/projects", label: "Projects", icon: FolderKanban },
-  { href: "/portal/invoices", label: "Invoices", icon: Receipt },
+const NAV: { href: string; label: string; icon: IconName }[] = [
+  { href: "/portal", label: "Overview", icon: "dashboard" },
+  { href: "/portal/proposals", label: "Proposals", icon: "proposal" },
+  { href: "/portal/projects", label: "Projects", icon: "project" },
+  { href: "/portal/invoices", label: "Invoices", icon: "invoice" },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
@@ -49,7 +49,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 active && "bg-accent text-foreground"
               )}
             >
-              <item.icon className={cn("size-4", active && "text-primary")} />
+              <ClientFlowIcon name={item.icon} size={16} className={cn(active && "text-primary")} />
               {item.label}
             </Link>
           );
@@ -89,7 +89,7 @@ export function PortalShell({
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="lg:hidden">
-                  <Menu className="size-5" />
+                  <ClientFlowIcon name="menu" size={20} />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-72 p-0">
@@ -102,13 +102,12 @@ export function PortalShell({
               </SheetContent>
             </Sheet>
             <span className="text-muted-foreground hidden items-center gap-1.5 text-xs font-medium sm:flex">
-              <Sun className="size-3.5" />
+              <ClientFlowIcon name="sun" size={14} />
               Client portal
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="focus-visible:ring-ring flex items-center gap-2 rounded-full outline-none focus-visible:ring-2">
@@ -126,7 +125,7 @@ export function PortalShell({
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive" onClick={handleLogout}>
-                  <LogOut className="size-4" />
+                  <ClientFlowIcon name="log-out" size={16} />
                   Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>

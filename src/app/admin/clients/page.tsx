@@ -1,18 +1,9 @@
 "use client";
+import { ClientFlowIcon } from "@/components/icons";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import * as React from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  LoaderCircle,
-  Mail,
-  MailPlus,
-  MoreHorizontal,
-  Pencil,
-  Plus,
-  Trash2,
-  UserPlus,
-  Users,
-} from "lucide-react";
+
 import { toast } from "sonner";
 import { useRealtime } from "@/components/use-realtime";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -162,7 +153,7 @@ export default function AdminClientsPage() {
           </p>
         </div>
         <Button onClick={openCreate}>
-          <UserPlus className="size-4" />
+          <ClientFlowIcon name="user-plus" size={16} />
           Add client
         </Button>
       </div>
@@ -222,9 +213,9 @@ export default function AdminClientsPage() {
                         disabled={inviting === c.id}
                       >
                         {inviting === c.id ? (
-                          <LoaderCircle className="size-3.5 animate-spin" />
+                          <ClientFlowIcon name="loader" size={14} className="animate-spin" />
                         ) : (
-                          <MailPlus className="size-3.5" />
+                          <ClientFlowIcon name="mail-plus" size={14} />
                         )}
                         Invite
                       </Button>
@@ -237,17 +228,17 @@ export default function AdminClientsPage() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="size-4" />
+                          <ClientFlowIcon name="more" size={16} />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => openEdit(c)}>
-                          <Pencil className="size-4" />
+                          <ClientFlowIcon name="edit" size={16} />
                           Edit
                         </DropdownMenuItem>
                         {!c.hasAccount && (
                           <DropdownMenuItem onClick={() => handleInvite(c)}>
-                            <Mail className="size-4" />
+                            <ClientFlowIcon name="mail" size={16} />
                             Send invite
                           </DropdownMenuItem>
                         )}
@@ -255,7 +246,7 @@ export default function AdminClientsPage() {
                           variant="destructive"
                           onClick={() => handleDelete(c)}
                         >
-                          <Trash2 className="size-4" />
+                          <ClientFlowIcon name="trash" size={16} />
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -267,12 +258,12 @@ export default function AdminClientsPage() {
             {!isLoading && data?.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="py-12 text-center">
-                  <Users className="text-muted-foreground mx-auto mb-3 size-8" />
+                  <ClientFlowIcon name="crm" size={32} className="text-muted-foreground mx-auto mb-3" />
                   <p className="text-muted-foreground text-sm">
                     No clients yet. Add your first client to start sending proposals.
                   </p>
                   <Button size="sm" className="mt-4" onClick={openCreate}>
-                    <Plus className="size-4" />
+                    <ClientFlowIcon name="plus" size={16} />
                     Add client
                   </Button>
                 </TableCell>
@@ -340,7 +331,7 @@ export default function AdminClientsPage() {
                 Cancel
               </Button>
               <Button type="submit" disabled={saving}>
-                {saving && <LoaderCircle className="size-4 animate-spin" />}
+                {saving && <ClientFlowIcon name="loader" size={16} className="animate-spin" />}
                 {editing ? "Save changes" : "Create client"}
               </Button>
             </DialogFooter>

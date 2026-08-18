@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
+import { ClientFlowIcon, IconContainer } from "@/components/icons";
+import { useQuery } from "@tanstack/react-query";
 
 import * as React from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { FileText } from "lucide-react";
+
 import { useRealtime } from "@/components/use-realtime";
 import { StatusBadge } from "@/components/status-badge";
 import { Card } from "@/components/ui/card";
@@ -55,17 +56,17 @@ export default function PortalProposalsPage() {
               <Card className="gap-0 p-0 transition-all hover:-translate-y-0.5 hover:shadow-md">
                 <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-start gap-3">
-                    <span className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
-                      <FileText className="size-5" />
-                    </span>
+                    <IconContainer variant="cut" boxSize={40}>
+                      <ClientFlowIcon name="proposal" size={20} className="text-primary" />
+                    </IconContainer>
                     <div>
                       <p className="font-semibold">{p.title}</p>
                       <p className="text-muted-foreground text-xs">
-                        {p.number} · sent {formatDate(p.createdAt)}
+                        {p.number} Â· sent {formatDate(p.createdAt)}
                       </p>
                       {p.status === "sent" && (
                         <p className="text-primary mt-1 text-xs font-medium">
-                          Awaiting your signature — review &amp; sign →
+                          Awaiting your signature â€” review &amp; sign â†’
                         </p>
                       )}
                     </div>
@@ -83,7 +84,7 @@ export default function PortalProposalsPage() {
 
         {!isLoading && data?.length === 0 && (
           <Card className="py-12 text-center">
-            <FileText className="text-muted-foreground mx-auto mb-3 size-8" />
+            <ClientFlowIcon name="proposal" size={32} className="text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground text-sm">
               No proposals have been shared with you yet.
             </p>

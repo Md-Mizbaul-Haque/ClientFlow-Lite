@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
+import { ClientFlowIcon, IconContainer, type IconName } from "@/components/icons";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import * as React from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Banknote, CreditCard, LoaderCircle, Plus, Receipt, Trash2 } from "lucide-react";
+
 import { toast } from "sonner";
 import { useRealtime } from "@/components/use-realtime";
 import { StatusBadge } from "@/components/status-badge";
@@ -139,7 +140,7 @@ export default function AdminInvoicesPage() {
           </p>
         </div>
         <Button onClick={() => setOpen(true)}>
-          <Plus className="size-4" />
+          <ClientFlowIcon name="plus" size={16} />
           New invoice
         </Button>
       </div>
@@ -147,7 +148,7 @@ export default function AdminInvoicesPage() {
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <CardStat
-            icon={Receipt}
+            icon="invoice"
             label="Outstanding"
             value={formatCurrency(
               unpaid.reduce((sum, i) => sum + i.amount, 0),
@@ -158,7 +159,7 @@ export default function AdminInvoicesPage() {
         </Card>
         <Card>
           <CardStat
-            icon={Banknote}
+            icon="banknote"
             label="Collected"
             value={formatCurrency(collected, "USD")}
             hint="All-time paid invoices"
@@ -196,7 +197,7 @@ export default function AdminInvoicesPage() {
                 <TableRow key={inv.id}>
                   <TableCell className="font-medium">{inv.number}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {inv.client?.name ?? "—"}
+                    {inv.client?.name ?? "â€”"}
                   </TableCell>
                   <TableCell className="text-muted-foreground capitalize">{inv.type}</TableCell>
                   <TableCell className="text-right font-medium">
@@ -206,7 +207,7 @@ export default function AdminInvoicesPage() {
                     <StatusBadge status={inv.status} />
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    {inv.dueDate ? formatDate(inv.dueDate) : "—"}
+                    {inv.dueDate ? formatDate(inv.dueDate) : "â€”"}
                   </TableCell>
                   <TableCell>
                     {inv.status !== "paid" && (
@@ -216,7 +217,7 @@ export default function AdminInvoicesPage() {
                         className="text-muted-foreground hover:text-destructive"
                         onClick={() => handleDelete(inv)}
                       >
-                        <Trash2 className="size-4" />
+                        <ClientFlowIcon name="trash" size={16} />
                       </Button>
                     )}
                   </TableCell>
@@ -226,12 +227,12 @@ export default function AdminInvoicesPage() {
             {!isLoading && data?.length === 0 && (
               <TableRow>
                 <TableCell colSpan={7} className="py-12 text-center">
-                  <CreditCard className="text-muted-foreground mx-auto mb-3 size-8" />
+                  <ClientFlowIcon name="payment" size={32} className="text-muted-foreground mx-auto mb-3" />
                   <p className="text-muted-foreground text-sm">
                     No invoices yet. Create one to accept payments.
                   </p>
                   <Button size="sm" className="mt-4" onClick={() => setOpen(true)}>
-                    <Plus className="size-4" />
+                    <ClientFlowIcon name="plus" size={16} />
                     New invoice
                   </Button>
                 </TableCell>
@@ -262,7 +263,7 @@ export default function AdminInvoicesPage() {
                 <SelectContent>
                   {clients?.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
-                      {c.name} · {c.company}
+                      {c.name} Â· {c.company}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -332,7 +333,7 @@ export default function AdminInvoicesPage() {
                 Cancel
               </Button>
               <Button type="submit" disabled={saving}>
-                {saving && <LoaderCircle className="size-4 animate-spin" />}
+                {saving && <ClientFlowIcon name="loader" size={16} className="animate-spin" />}
                 Create invoice
               </Button>
             </DialogFooter>
@@ -349,7 +350,7 @@ function CardStat({
   value,
   hint,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: IconName;
   label: string;
   value: string;
   hint: string;
@@ -361,9 +362,9 @@ function CardStat({
         <p className="text-2xl font-semibold tracking-tight">{value}</p>
         <p className="text-muted-foreground text-xs">{hint}</p>
       </div>
-      <span className="bg-primary/10 text-primary flex size-10 items-center justify-center rounded-xl">
-        <Icon className="size-5" />
-      </span>
+      <IconContainer variant="crop" boxSize={40}>
+        <ClientFlowIcon name={Icon} size={20} className="text-primary" />
+      </IconContainer>
     </div>
   );
 }

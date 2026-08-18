@@ -1,16 +1,10 @@
-"use client";
+﻿"use client";
+import { ClientFlowIcon, IconContainer } from "@/components/icons";
+import { useQuery } from "@tanstack/react-query";
 
 import * as React from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import {
-  ArrowRight,
-  FileSignature,
-  FolderKanban,
-  Receipt,
-  Sparkles,
-  Wallet,
-} from "lucide-react";
+
 import { useRealtime } from "@/components/use-realtime";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
@@ -95,7 +89,7 @@ export default function PortalOverviewPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Your workspace</h1>
           <p className="text-muted-foreground text-sm">
-            Proposals, projects, and invoices — all in one place.
+            Proposals, projects, and invoices â€” all in one place.
           </p>
         </div>
       </div>
@@ -105,9 +99,9 @@ export default function PortalOverviewPage() {
           <Card className="border-primary/30 bg-primary/[0.04] lg:col-span-2">
             <CardContent className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-3">
-                <span className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
-                  <FileSignature className="size-5" />
-                </span>
+                <IconContainer variant="cut" boxSize={40}>
+                  <ClientFlowIcon name="signature" size={20} className="text-primary" />
+                </IconContainer>
                 <div>
                   <p className="font-semibold">Your signature is needed</p>
                   <p className="text-muted-foreground text-sm">
@@ -119,7 +113,7 @@ export default function PortalOverviewPage() {
               <Button asChild className="shrink-0">
                 <Link href={`/portal/proposals/${needsSignature.id}`}>
                   Review &amp; sign
-                  <ArrowRight className="size-4" />
+                  <ClientFlowIcon name="arrow-right" size={16} />
                 </Link>
               </Button>
             </CardContent>
@@ -130,7 +124,7 @@ export default function PortalOverviewPage() {
           <Card className="bg-card lg:col-span-2">
             <CardContent className="flex flex-col gap-3 py-5">
               <div className="flex items-center gap-2">
-                <Sparkles className="text-primary size-4" />
+                <ClientFlowIcon name="sparkles" size={16} className="text-primary" />
                 <p className="font-semibold">All caught up</p>
               </div>
               <p className="text-muted-foreground text-sm">
@@ -165,7 +159,7 @@ export default function PortalOverviewPage() {
             {unpaidInvoice && (
               <Button asChild variant="outline" size="sm" className="mt-1">
                 <Link href="/portal/invoices">
-                  <Wallet className="size-4" />
+                  <ClientFlowIcon name="wallet" size={16} />
                   Pay now
                 </Link>
               </Button>
@@ -181,7 +175,7 @@ export default function PortalOverviewPage() {
               <CardTitle className="text-base">Active project</CardTitle>
               <CardDescription>Current milestone progress</CardDescription>
             </div>
-            <FolderKanban className="text-primary size-5" />
+            <ClientFlowIcon name="project" size={20} className="text-primary" />
           </CardHeader>
           <CardContent>
             {activeProject ? (
@@ -215,7 +209,7 @@ export default function PortalOverviewPage() {
                         href={`/portal/projects/${activeProject.id}`}
                         className="text-primary hover:underline"
                       >
-                        View timeline →
+                        View timeline â†’
                       </Link>
                     </div>
                   </div>
@@ -235,7 +229,7 @@ export default function PortalOverviewPage() {
               <CardTitle className="text-base">Recent proposals</CardTitle>
               <CardDescription>Latest updates from your agency</CardDescription>
             </div>
-            <Receipt className="text-primary size-5" />
+            <ClientFlowIcon name="invoice" size={20} className="text-primary" />
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
             {data.proposals.slice(0, 4).map((p) => (
@@ -247,7 +241,7 @@ export default function PortalOverviewPage() {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{p.title}</p>
                   <p className="text-muted-foreground text-xs">
-                    {p.number} · {formatCurrency(p.price, p.currency)}
+                    {p.number} Â· {formatCurrency(p.price, p.currency)}
                   </p>
                 </div>
                 <StatusBadge status={p.status} />

@@ -1,9 +1,10 @@
 "use client";
+import { ClientFlowIcon } from "@/components/icons";
+import { useQuery } from "@tanstack/react-query";
 
 import * as React from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { FilePlus2, FileSignature, PenLine, Trash2 } from "lucide-react";
+
 import { toast } from "sonner";
 import { useRealtime } from "@/components/use-realtime";
 import { StatusBadge } from "@/components/status-badge";
@@ -83,7 +84,7 @@ export default function AdminProposalsPage() {
         </div>
         <Button asChild>
           <Link href="/admin/proposals/new">
-            <FilePlus2 className="size-4" />
+            <ClientFlowIcon name="file-plus" size={16} />
             New proposal
           </Link>
         </Button>
@@ -140,7 +141,7 @@ export default function AdminProposalsPage() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
-                          <PenLine className="size-4" />
+                          <ClientFlowIcon name="edit" size={16} />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -149,7 +150,7 @@ export default function AdminProposalsPage() {
                         </DropdownMenuItem>
                         {p.status === "draft" && (
                           <DropdownMenuItem onClick={() => handleSend(p.id)}>
-                            <FileSignature className="size-4" />
+                            <ClientFlowIcon name="signature" size={16} />
                             Send to client
                           </DropdownMenuItem>
                         )}
@@ -157,7 +158,7 @@ export default function AdminProposalsPage() {
                           variant="destructive"
                           onClick={() => handleDelete(p.id)}
                         >
-                          <Trash2 className="size-4" />
+                          <ClientFlowIcon name="trash" size={16} />
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -169,13 +170,13 @@ export default function AdminProposalsPage() {
             {!isLoading && data?.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="py-12 text-center">
-                  <FileSignature className="text-muted-foreground mx-auto mb-3 size-8" />
+                  <ClientFlowIcon name="signature" size={32} className="text-muted-foreground mx-auto mb-3" />
                   <p className="text-muted-foreground text-sm">
                     No proposals yet. Create your first one to get started.
                   </p>
                   <Button asChild size="sm" className="mt-4">
                     <Link href="/admin/proposals/new">
-                      <FilePlus2 className="size-4" />
+                      <ClientFlowIcon name="file-plus" size={16} />
                       New proposal
                     </Link>
                   </Button>

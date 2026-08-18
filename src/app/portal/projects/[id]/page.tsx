@@ -1,20 +1,10 @@
 "use client";
-
-import * as React from "react";
+import { ClientFlowIcon, IconContainer, type IconName } from "@/components/icons";
 import { useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  CheckCircle2,
-  Circle,
-  Download,
-  FileArchive,
-  FileText,
-  Image as ImageIcon,
-  LoaderCircle,
-  Paperclip,
-  Trash2,
-  UploadCloud,
-} from "lucide-react";
+
+import * as React from "react";
+
 import { toast } from "sonner";
 import { useRealtime } from "@/components/use-realtime";
 import { StatusBadge } from "@/components/status-badge";
@@ -51,11 +41,11 @@ interface ProjectDetail {
   deliverables: Deliverable[];
 }
 
-function fileIcon(mime: string) {
-  if (mime.startsWith("image/")) return ImageIcon;
-  if (mime === "application/pdf" || mime.includes("word") || mime.includes("text")) return FileText;
-  if (mime.includes("zip") || mime.includes("octet")) return FileArchive;
-  return Paperclip;
+function fileIcon(mime: string): IconName {
+  if (mime.startsWith("image/")) return "image";
+  if (mime === "application/pdf" || mime.includes("word") || mime.includes("text")) return "proposal";
+  if (mime.includes("zip") || mime.includes("octet")) return "file-archive";
+  return "paperclip";
 }
 
 function formatSize(bytes: number) {
@@ -176,11 +166,11 @@ export default function PortalProjectDetailPage() {
                       )}
                     >
                       {completed ? (
-                        <CheckCircle2 className="text-emerald-500 size-3" />
+                        <ClientFlowIcon name="check-circle" size={12} className="text-emerald-500" />
                       ) : active ? (
                         <span className="bg-primary size-2 rounded-full" />
                       ) : (
-                        <Circle className="text-muted-foreground/50 size-2.5" />
+                        <ClientFlowIcon name="circle" className="text-muted-foreground/50 size-2.5" />
                       )}
                     </span>
                     <div className="flex flex-col gap-1">
@@ -219,9 +209,9 @@ export default function PortalProjectDetailPage() {
               )}
             >
               {uploading ? (
-                <LoaderCircle className="text-primary size-6 animate-spin" />
+                <ClientFlowIcon name="loader" size={24} className="text-primary animate-spin" />
               ) : (
-                <UploadCloud className="text-muted-foreground size-6" />
+                <ClientFlowIcon name="upload-cloud" size={24} className="text-muted-foreground" />
               )}
               <span className="text-sm font-medium">
                 {uploading ? "Uploading…" : "Click to upload a deliverable"}
@@ -252,9 +242,9 @@ export default function PortalProjectDetailPage() {
                     className="group flex items-center justify-between gap-3 py-2.5"
                   >
                     <div className="flex min-w-0 items-center gap-3">
-                      <span className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-lg">
-                        <Icon className="size-4" />
-                      </span>
+                      <IconContainer variant="cut" boxSize={36}>
+                        <ClientFlowIcon name={Icon} size={16} className="text-primary" />
+                      </IconContainer>
                       <div className="min-w-0">
                         <a
                           href={d.downloadUrl}
@@ -272,7 +262,7 @@ export default function PortalProjectDetailPage() {
                     <div className="flex shrink-0 items-center gap-1">
                       <Button variant="ghost" size="icon" asChild>
                         <a href={d.downloadUrl} download>
-                          <Download className="size-4" />
+                          <ClientFlowIcon name="download" size={16} />
                         </a>
                       </Button>
                       <Button
@@ -281,7 +271,7 @@ export default function PortalProjectDetailPage() {
                         className="text-muted-foreground hover:text-destructive opacity-0 transition-opacity group-hover:opacity-100"
                         onClick={() => handleDelete(d.id)}
                       >
-                        <Trash2 className="size-4" />
+                        <ClientFlowIcon name="trash" size={16} />
                       </Button>
                     </div>
                   </div>

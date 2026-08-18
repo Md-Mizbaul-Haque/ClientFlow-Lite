@@ -1,19 +1,10 @@
 "use client";
-
-import * as React from "react";
+import { ClientFlowIcon } from "@/components/icons";
 import { useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  BadgeCheck,
-  Banknote,
-  CheckCircle2,
-  FileSignature,
-  LoaderCircle,
-  ShieldCheck,
-  Target,
-  ThumbsDown,
-  XCircle,
-} from "lucide-react";
+
+import * as React from "react";
+
 import { toast } from "sonner";
 import { useRealtime } from "@/components/use-realtime";
 import { SignaturePad } from "@/components/signature-pad";
@@ -149,7 +140,7 @@ export default function PortalProposalDetailPage() {
 
       {data.status === "sent" && (
         <Alert variant="warning">
-          <FileSignature />
+          <ClientFlowIcon name="signature" />
           <AlertTitle>Awaiting your signature</AlertTitle>
           <AlertDescription>
             Review the proposal below. Once you confirm the deliverables and sign, the agreement
@@ -160,7 +151,7 @@ export default function PortalProposalDetailPage() {
 
       {data.status === "accepted" && signed && (
         <Alert variant="success">
-          <CheckCircle2 />
+          <ClientFlowIcon name="check-circle" />
           <AlertTitle>Proposal signed</AlertTitle>
           <AlertDescription>
             {data.signature?.name ?? "You"} accepted this proposal on{" "}
@@ -171,7 +162,7 @@ export default function PortalProposalDetailPage() {
 
       {data.status === "declined" && (
         <Alert variant="destructive">
-          <XCircle />
+          <ClientFlowIcon name="x-circle" />
           <AlertTitle>Proposal declined</AlertTitle>
           <AlertDescription>
             You declined this proposal. Your agency will follow up with you.
@@ -193,7 +184,7 @@ export default function PortalProposalDetailPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Target className="text-primary size-4" />
+            <ClientFlowIcon name="target" size={16} className="text-primary" />
             Scope of work
           </CardTitle>
         </CardHeader>
@@ -212,7 +203,7 @@ export default function PortalProposalDetailPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <CheckCircle2 className="text-primary size-4" />
+            <ClientFlowIcon name="check-circle" size={16} className="text-primary" />
             Deliverables
           </CardTitle>
           <CardDescription>
@@ -247,7 +238,7 @@ export default function PortalProposalDetailPage() {
                   )}
                 </div>
                 {checked && (
-                  <BadgeCheck className="text-emerald-500 ml-auto size-5 shrink-0" />
+                  <ClientFlowIcon name="approval" size={20} className="text-emerald-500 ml-auto shrink-0" />
                 )}
               </label>
             );
@@ -259,7 +250,7 @@ export default function PortalProposalDetailPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <ShieldCheck className="text-primary size-4" />
+              <ClientFlowIcon name="shield" size={16} className="text-primary" />
               Terms
             </CardTitle>
           </CardHeader>
@@ -279,7 +270,7 @@ export default function PortalProposalDetailPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Banknote className="text-primary size-4" />
+            <ClientFlowIcon name="banknote" size={16} className="text-primary" />
             Total investment
           </CardTitle>
         </CardHeader>
@@ -330,11 +321,11 @@ export default function PortalProposalDetailPage() {
             <SignaturePad value={signature} onChange={setSignature} />
             <div className="flex flex-col gap-2 sm:flex-row">
               <Button onClick={handleSign} disabled={signing} className="flex-1">
-                {signing ? <LoaderCircle className="size-4 animate-spin" /> : <FileSignature className="size-4" />}
+                {signing ? <ClientFlowIcon name="loader" size={16} className="animate-spin" /> : <ClientFlowIcon name="signature" size={16} />}
                 Accept &amp; sign proposal
               </Button>
               <Button variant="outline" onClick={handleDecline}>
-                <ThumbsDown className="size-4" />
+                <ClientFlowIcon name="thumbs-down" size={16} />
                 Decline
               </Button>
             </div>

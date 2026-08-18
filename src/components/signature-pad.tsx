@@ -1,7 +1,7 @@
-"use client";
-
+﻿"use client";
+import { ClientFlowIcon } from "@/components/icons";
 import * as React from "react";
-import { Eraser, LoaderCircle } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -90,9 +90,9 @@ export function SignaturePad({ value, onChange, className }: SignaturePadProps) 
         {!value && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div className="flex flex-col items-center gap-1">
-              <LoaderCircle className={cn("size-5 text-muted-foreground/50", !ready && "animate-spin")} />
+              <ClientFlowIcon name="loader" className={cn("size-5 text-muted-foreground/50", !ready && "animate-spin")} />
               <span className="text-muted-foreground/60 text-xs">
-                {ready ? "Sign above with your finger or mouse" : "Preparing canvas…"}
+                {ready ? "Sign above with your finger or mouse" : "Preparing canvasâ€¦"}
               </span>
             </div>
           </div>
@@ -107,7 +107,7 @@ export function SignaturePad({ value, onChange, className }: SignaturePadProps) 
           className="text-muted-foreground h-7"
           onClick={handleClear}
         >
-          <Eraser className="size-3.5" />
+          <ClientFlowIcon name="eraser" size={14} />
           Clear
         </Button>
       </div>

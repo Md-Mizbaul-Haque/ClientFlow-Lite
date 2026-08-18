@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
+import { ClientFlowIcon, IconContainer } from "@/components/icons";
+import { useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 import * as React from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { CreditCard, ExternalLink, LoaderCircle, Receipt } from "lucide-react";
+
 import { toast } from "sonner";
 import { useRealtime } from "@/components/use-realtime";
 import { StatusBadge } from "@/components/status-badge";
@@ -72,16 +73,16 @@ export default function PortalInvoicesPage() {
 
       {paid && (
         <Alert variant="success">
-          <CreditCard />
+          <ClientFlowIcon name="payment" />
           <AlertTitle>Payment successful</AlertTitle>
           <AlertDescription>
-            Thanks — your payment went through. Your agency has been notified.
+            Thanks â€” your payment went through. Your agency has been notified.
           </AlertDescription>
         </Alert>
       )}
       {cancelled && (
         <Alert variant="warning">
-          <CreditCard />
+          <ClientFlowIcon name="payment" />
           <AlertTitle>Payment cancelled</AlertTitle>
           <AlertDescription>No charges were made. You can try again any time.</AlertDescription>
         </Alert>
@@ -89,7 +90,7 @@ export default function PortalInvoicesPage() {
 
       {data && data.length > 0 && (
         <Alert>
-          <CreditCard />
+          <ClientFlowIcon name="payment" />
           <AlertTitle>Test mode</AlertTitle>
           <AlertDescription>
             <p>
@@ -110,14 +111,14 @@ export default function PortalInvoicesPage() {
             <Card key={inv.id} className="gap-0 p-0">
               <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3">
-                  <span className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
-                    <Receipt className="size-5" />
-                  </span>
+                  <IconContainer variant="cut" boxSize={40}>
+                    <ClientFlowIcon name="invoice" size={20} className="text-primary" />
+                  </IconContainer>
                   <div>
                     <p className="font-semibold">
                       {inv.number}
                       <span className="text-muted-foreground ml-2 text-xs capitalize">
-                        · {inv.type} payment
+                        Â· {inv.type} payment
                       </span>
                     </p>
                     <p className="text-muted-foreground text-xs">
@@ -134,9 +135,9 @@ export default function PortalInvoicesPage() {
                     {(inv.status === "sent" || inv.status === "overdue") && (
                       <Button size="sm" onClick={() => handlePay(inv.id)} disabled={paying === inv.id}>
                         {paying === inv.id ? (
-                          <LoaderCircle className="size-4 animate-spin" />
+                          <ClientFlowIcon name="loader" size={16} className="animate-spin" />
                         ) : (
-                          <ExternalLink className="size-4" />
+                          <ClientFlowIcon name="arrow-up-right" size={16} />
                         )}
                         Pay with Stripe
                       </Button>
@@ -149,7 +150,7 @@ export default function PortalInvoicesPage() {
 
         {!isLoading && data?.length === 0 && (
           <Card className="py-12 text-center">
-            <Receipt className="text-muted-foreground mx-auto mb-3 size-8" />
+            <ClientFlowIcon name="invoice" size={32} className="text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground text-sm">No invoices for you yet.</p>
             <Button asChild variant="link" className="mt-1">
               <Link href="/portal">Back to overview</Link>

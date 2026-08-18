@@ -1,13 +1,14 @@
-"use client";
+﻿"use client";
+import { ClientFlowIcon, IconContainer } from "@/components/icons";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { ArrowRight, KeyRound, LoaderCircle, Mail, ShieldCheck, Sparkles } from "lucide-react";
+
 import { toast } from "sonner";
+import { AuthMarketingPanel } from "@/components/auth-marketing-panel";
 import { Brand } from "@/components/brand";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -45,17 +46,17 @@ export default function LoginPage() {
         <div className="absolute -bottom-52 right-0 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
       </div>
 
-      <div className="relative flex w-full max-w-md flex-col">
-        <div className="mb-8 flex items-center justify-between">
-          <Brand />
-          <ThemeToggle />
-        </div>
+      <div className="relative flex w-full max-w-5xl flex-col gap-12 lg:flex-row lg:items-center">
+        <div className="flex w-full max-w-md flex-col">
+          <div className="mb-8">
+            <Brand />
+          </div>
 
         <Card className="border-border/60 bg-card/90 shadow-xl backdrop-blur">
           <CardHeader>
-            <div className="bg-primary/10 text-primary mb-2 flex size-11 items-center justify-center rounded-xl">
-              <ShieldCheck className="size-5" />
-            </div>
+            <IconContainer variant="ring" boxSize={44} className="mb-2">
+              <ClientFlowIcon name="shield" size={20} className="text-primary" />
+            </IconContainer>
             <CardTitle className="text-2xl">Agency sign in</CardTitle>
             <CardDescription>
               Access the admin dashboard to manage proposals, clients, and projects.
@@ -66,7 +67,7 @@ export default function LoginPage() {
               <div className="flex flex-col gap-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
-                  <Mail className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                  <ClientFlowIcon name="mail" size={16} className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2" />
                   <Input
                     id="email"
                     type="email"
@@ -82,11 +83,11 @@ export default function LoginPage() {
               <div className="flex flex-col gap-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
-                  <KeyRound className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                  <ClientFlowIcon name="key" size={16} className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2" />
                   <Input
                     id="password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                     className="pl-9"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -96,7 +97,7 @@ export default function LoginPage() {
                 </div>
               </div>
               <Button type="submit" className="mt-1 w-full" disabled={loading}>
-                {loading ? <LoaderCircle className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+                {loading ? <ClientFlowIcon name="loader" size={16} className="animate-spin" /> : <ClientFlowIcon name="sparkles" size={16} />}
                 Sign in
               </Button>
             </form>
@@ -109,7 +110,7 @@ export default function LoginPage() {
 
             <Button variant="outline" asChild className="w-full">
               <Link href="/auth/magic-link">
-                <ArrowRight className="size-4" />
+                <ClientFlowIcon name="arrow-right" size={16} />
                 Client? Sign in with a magic link
               </Link>
             </Button>
@@ -120,6 +121,9 @@ export default function LoginPage() {
           Need a database configured? Add <code className="font-mono">MONGODB_URI</code> to .env and
           run <code className="font-mono">npm run seed</code> to create your admin account.
         </p>
+        </div>
+
+        <AuthMarketingPanel />
       </div>
     </div>
   );

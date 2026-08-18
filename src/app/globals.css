@@ -1,116 +1,133 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
+/* Theme system removed: `dark:` utilities are pinned to a `.dark` class
+   that no component ever sets, overriding Tailwind's default
+   `prefers-color-scheme` behavior. */
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.9940 0 0);
-  --foreground: oklch(0 0 0);
-  --card: oklch(1 0 180);
-  --card-foreground: oklch(0.2560 0 180);
-  --popover: oklch(1 0 180);
-  --popover-foreground: oklch(0.2560 0 180);
-  --primary: oklch(0.5772 0.2129 274);
-  --primary-foreground: oklch(1 0 180);
-  --secondary: oklch(0.8880 0 172.4050);
-  --secondary-foreground: oklch(0.2160 0 180);
-  --muted: oklch(0.9612 0 0);
-  --muted-foreground: oklch(0.6050 0 180);
-  --accent: oklch(0.7037 0.1568 277.9576);
-  --accent-foreground: oklch(1 0 180);
-  --destructive: oklch(0.6540 0.2320 28.6600);
-  --destructive-foreground: oklch(1 0 180);
-  --border: oklch(0.9401 0 0);
-  --input: oklch(0.8510 0 180);
-  --ring: oklch(0.6830 0 180);
-  --chart-1: oklch(0.5772 0.2129 274);
-  --chart-2: oklch(0.8726 0.0593 270.4500);
-  --chart-3: oklch(0.6792 0.1659 272.9200);
-  --chart-4: oklch(0.9310 0.0312 269.6900);
-  --chart-5: oklch(0.7896 0.1050 270.5900);
-  --sidebar: oklch(0.9761 0 0);
-  --sidebar-foreground: oklch(0 0 0);
-  --sidebar-primary: oklch(0.5772 0.2129 274);
-  --sidebar-primary-foreground: oklch(1 0 180);
-  --sidebar-accent: oklch(0.7037 0.1568 277.9576);
-  --sidebar-accent-foreground: oklch(1 0 180);
-  --sidebar-border: oklch(0.9401 0 0);
-  --sidebar-ring: oklch(0.6830 0 180);
-  --font-sans: Google Sans Flex, ui-sans-serif, sans-serif, system-ui;
-  --font-serif: Google Sans Flex, ui-sans-serif, sans-serif, system-ui;
-  --font-mono: Source Code Pro, ui-monospace, monospace;
-  --radius: 0.75rem;
-  --shadow-x: 0;
+  --background: oklch(0.9838 0.0035 247.8583);
+  --foreground: oklch(0.1284 0.0267 261.5937);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.1284 0.0267 261.5937);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.1284 0.0267 261.5937);
+  --primary: oklch(0.4865 0.2423 291.8661);
+  --primary-foreground: oklch(0.9838 0.0035 247.8583);
+  --secondary: oklch(0.9486 0.0085 303.5068);
+  --secondary-foreground: oklch(0.341 0.1625 292.9477);
+  --muted: oklch(0.9679 0.0027 264.5424);
+  --muted-foreground: oklch(0.5503 0.0235 264.362);
+  --accent: oklch(0.9546 0.0227 303.2883);
+  --accent-foreground: oklch(0.4865 0.2423 291.8661);
+  --destructive: oklch(0.6356 0.2082 25.3782);
+  --destructive-foreground: oklch(0.9838 0.0035 247.8583);
+  --border: oklch(0.9278 0.0058 264.5314);
+  --input: oklch(0.9278 0.0058 264.5314);
+  --ring: oklch(0.4865 0.2423 291.8661);
+  --chart-1: oklch(0.4865 0.2423 291.8661);
+  --chart-2: oklch(0.7216 0.1282 217.8676);
+  --chart-3: oklch(0.6356 0.1398 156.1492);
+  --chart-4: oklch(0.6192 0.2037 312.7283);
+  --chart-5: oklch(0.6532 0.2114 353.9392);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.1284 0.0267 261.5937);
+  --sidebar-primary: oklch(0.4865 0.2423 291.8661);
+  --sidebar-primary-foreground: oklch(0.9838 0.0035 247.8583);
+  --sidebar-accent: oklch(0.9486 0.0085 303.5068);
+  --sidebar-accent-foreground: oklch(0.4865 0.2423 291.8661);
+  --sidebar-border: oklch(0.9278 0.0058 264.5314);
+  --sidebar-ring: oklch(0.4865 0.2423 291.8661);
+  --font-sans: Plus Jakarta Sans, Inter, system-ui, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: JetBrains Mono, monospace;
+  --radius: 1rem;
+  --shadow-x: 0px;
   --shadow-y: 8px;
-  --shadow-blur: 12px;
-  --shadow-spread: 2px;
-  --shadow-opacity: 0.005;
-  --shadow-color: #000000;
-  --shadow-2xs: 0 8px 12px 2px hsl(0 0% 0% / 0.00);
-  --shadow-xs: 0 8px 12px 2px hsl(0 0% 0% / 0.00);
-  --shadow-sm: 0 8px 12px 2px hsl(0 0% 0% / 0.01), 0 1px 2px 1px hsl(0 0% 0% / 0.01);
-  --shadow: 0 8px 12px 2px hsl(0 0% 0% / 0.01), 0 1px 2px 1px hsl(0 0% 0% / 0.01);
-  --shadow-md: 0 8px 12px 2px hsl(0 0% 0% / 0.01), 0 2px 4px 1px hsl(0 0% 0% / 0.01);
-  --shadow-lg: 0 8px 12px 2px hsl(0 0% 0% / 0.01), 0 4px 6px 1px hsl(0 0% 0% / 0.01);
-  --shadow-xl: 0 8px 12px 2px hsl(0 0% 0% / 0.01), 0 8px 10px 1px hsl(0 0% 0% / 0.01);
-  --shadow-2xl: 0 8px 12px 2px hsl(0 0% 0% / 0.01);
-  --tracking-normal: 0em;
-  --spacing: 0.275rem;
-}
+  --shadow-blur: 30px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0.08;
+  --shadow-color: hsl(263, 70%, 50%);
+  --shadow-2xs: 0px 8px 30px 0px hsl(263 70% 50% / 0.04);
+  --shadow-xs: 0px 8px 30px 0px hsl(263 70% 50% / 0.04);
+  --shadow-sm:
+    0px 8px 30px 0px hsl(263 70% 50% / 0.08),
+    0px 1px 2px -1px hsl(263 70% 50% / 0.08);
+  --shadow:
+    0px 8px 30px 0px hsl(263 70% 50% / 0.08),
+    0px 1px 2px -1px hsl(263 70% 50% / 0.08);
+  --shadow-md:
+    0px 8px 30px 0px hsl(263 70% 50% / 0.08),
+    0px 2px 4px -1px hsl(263 70% 50% / 0.08);
+  --shadow-lg:
+    0px 8px 30px 0px hsl(263 70% 50% / 0.08),
+    0px 4px 6px -1px hsl(263 70% 50% / 0.08);
+  --shadow-xl:
+    0px 8px 30px 0px hsl(263 70% 50% / 0.08),
+    0px 8px 10px -1px hsl(263 70% 50% / 0.08);
+  --shadow-2xl: 0px 8px 30px 0px hsl(263 70% 50% / 0.2);
+  --tracking-normal: -0.02em;
+  --spacing: 0.25rem;
 
-.dark {
-  --background: oklch(0.2195 0.0077 285.7400);
-  --foreground: oklch(0.9881 0 0);
-  --card: oklch(0.2624 0.0093 285.7400);
-  --card-foreground: oklch(0.9881 0 0);
-  --popover: oklch(0.2460 0.0070 248.1220);
-  --popover-foreground: oklch(0.9830 0.0040 348.8510);
-  --primary: oklch(0.5774 0.2091 273.8500);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.8880 0 172.4050);
-  --secondary-foreground: oklch(0.2160 0 180);
-  --muted: oklch(0.2387 0.0114 293.1598);
-  --muted-foreground: oklch(0.6890 0 164.0550);
-  --accent: oklch(0.6615 0.1490 277.6548);
-  --accent-foreground: oklch(1 0 180);
-  --destructive: oklch(0.5880 0.1990 24.3930);
-  --destructive-foreground: oklch(1 0 180);
-  --border: oklch(0.3089 0.0038 264.5091);
-  --input: oklch(0.2568 0.0076 274.6500);
-  --ring: oklch(0.7157 0.1532 235.7100);
-  --chart-1: oklch(0.5772 0.2129 274);
-  --chart-2: oklch(0.8726 0.0593 270.4500);
-  --chart-3: oklch(0.6792 0.1659 272.9200);
-  --chart-4: oklch(0.9310 0.0312 269.6900);
-  --chart-5: oklch(0.7896 0.1050 270.5900);
-  --sidebar: oklch(0.2452 0.0075 285.8300);
-  --sidebar-foreground: oklch(0.9881 0 0);
-  --sidebar-primary: oklch(0.5774 0.2091 273.8500);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.6615 0.1490 277.6548);
-  --sidebar-accent-foreground: oklch(1 0 180);
-  --sidebar-border: oklch(0.3089 0.0038 264.5091);
-  --sidebar-ring: oklch(0.7157 0.1532 235.7100);
-  --font-sans: Google Sans Flex, ui-sans-serif, sans-serif, system-ui;
-  --font-serif: Google Sans Flex, ui-sans-serif, sans-serif, system-ui;
-  --font-mono: Source Code Pro, ui-monospace, monospace;
-  --radius: 0.75rem;
-  --shadow-x: 0;
-  --shadow-y: 8px;
-  --shadow-blur: 12px;
-  --shadow-spread: 2px;
-  --shadow-opacity: 0.005;
-  --shadow-color: oklch(0 0 0);
-  --shadow-2xs: 0 8px 12px 2px hsl(0 0% 0% / 0.00);
-  --shadow-xs: 0 8px 12px 2px hsl(0 0% 0% / 0.00);
-  --shadow-sm: 0 8px 12px 2px hsl(0 0% 0% / 0.01), 0 1px 2px 1px hsl(0 0% 0% / 0.01);
-  --shadow: 0 8px 12px 2px hsl(0 0% 0% / 0.01), 0 1px 2px 1px hsl(0 0% 0% / 0.01);
-  --shadow-md: 0 8px 12px 2px hsl(0 0% 0% / 0.01), 0 2px 4px 1px hsl(0 0% 0% / 0.01);
-  --shadow-lg: 0 8px 12px 2px hsl(0 0% 0% / 0.01), 0 4px 6px 1px hsl(0 0% 0% / 0.01);
-  --shadow-xl: 0 8px 12px 2px hsl(0 0% 0% / 0.01), 0 8px 10px 1px hsl(0 0% 0% / 0.01);
-  --shadow-2xl: 0 8px 12px 2px hsl(0 0% 0% / 0.01);
+  /* ── Hero background design tokens ─────────────────────────────
+     ClientFlow Lite hero: warm base wash, geometric mesh + dot
+     patterns, orbit accents, OKLCH mesh glows and a gentle edge
+     vignette. Text readability is structural: linear masks anchor
+     all decoration to the right side (behind the product card) on
+     lg+ and to the bottom half when the layout stacks, so nothing
+     ever renders under the copy column. Tweak to re-skin.        */
+  --hero-base: oklch(0.99 0.004 96);
+  --hero-pattern-color: oklch(0.55 0.07 290 / 0.45);
+  --hero-pattern-mesh-size: 120px;
+  --hero-pattern-mesh-opacity: 1;
+  --hero-pattern-nodes-size: 320px;
+  --hero-pattern-nodes-opacity: 1;
+  --hero-pattern-dots-size: 22px;
+  --hero-pattern-dots-opacity: 0.85;
+  --hero-glow-primary: radial-gradient(
+    46% 44% at 72% 46%,
+    oklch(0.87 0.065 300 / 0.6) 0%,
+    oklch(0.87 0.065 300 / 0.16) 55%,
+    transparent 80%
+  );
+  --hero-glow-secondary: radial-gradient(
+    38% 30% at 90% 4%,
+    oklch(0.76 0.09 262 / 0.3) 0%,
+    transparent 74%
+  );
+  --hero-glow-tertiary: radial-gradient(
+    36% 30% at 6% 92%,
+    oklch(0.83 0.075 294 / 0.22) 0%,
+    transparent 76%
+  );
+  --hero-vignette: radial-gradient(
+    140% 125% at 50% 30%,
+    transparent 64%,
+    oklch(0.9 0.01 92 / 0.45) 122%
+  );
+  /* Right-anchored masks (lg+): the copy column never extends past
+     ~48% of the viewport (max-w-6xl centered), so pattern is
+     guaranteed invisible under the text and lives behind the card
+     and right edge only. */
+  --hero-mask-mesh: linear-gradient(
+    to left,
+    black 0%,
+    black 42%,
+    transparent 58%
+  );
+  --hero-mask-nodes: linear-gradient(
+    to left,
+    black 0%,
+    black 36%,
+    transparent 52%
+  );
+  --hero-mask-dots: linear-gradient(
+    to left,
+    black 0%,
+    black 50%,
+    transparent 64%
+  );
 }
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -162,6 +179,13 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+
+  --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
+  --tracking-tight: calc(var(--tracking-normal) - 0.025em);
+  --tracking-normal: var(--tracking-normal);
+  --tracking-wide: calc(var(--tracking-normal) + 0.025em);
+  --tracking-wider: calc(var(--tracking-normal) + 0.05em);
+  --tracking-widest: calc(var(--tracking-normal) + 0.1em);
 }
 
 @layer base {
@@ -170,5 +194,121 @@
   }
   body {
     @apply bg-background text-foreground;
+    letter-spacing: var(--tracking-normal);
+  }
+}
+
+@layer components {
+  /* ── Hero background layers ────────────────────────────────────
+     Stacked, fully token-driven background for the landing hero.
+     Layer order: base wash → dot grid → mesh pattern → sparse
+     nodes → orbit accents → radial glows → edge vignette. All
+     values come from the --hero-* design tokens above. Masks keep
+     the headline zone flat; decoration lives on the card side.  */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .hero-bg__base {
+    position: absolute;
+    inset: 0;
+    background: var(--hero-base);
+  }
+  .hero-bg__dots {
+    position: absolute;
+    inset: 0;
+    color: var(--hero-pattern-color);
+    background-image: radial-gradient(currentColor 1px, transparent 1px);
+    background-size: var(--hero-pattern-dots-size) var(--hero-pattern-dots-size);
+    opacity: var(--hero-pattern-dots-opacity);
+    -webkit-mask-image: var(--hero-mask-dots);
+    mask-image: var(--hero-mask-dots);
+  }
+  .hero-bg__pattern {
+    position: absolute;
+    inset: 0;
+    color: var(--hero-pattern-color);
+  }
+  .hero-bg__pattern--mesh {
+    background-image: url("/hero-pattern-mesh.svg");
+    background-size: var(--hero-pattern-mesh-size) var(--hero-pattern-mesh-size);
+    opacity: var(--hero-pattern-mesh-opacity);
+    -webkit-mask-image: var(--hero-mask-mesh);
+    mask-image: var(--hero-mask-mesh);
+  }
+  .hero-bg__pattern--nodes {
+    background-image: url("/hero-pattern-nodes.svg");
+    background-size: var(--hero-pattern-nodes-size) var(--hero-pattern-nodes-size);
+    opacity: var(--hero-pattern-nodes-opacity);
+    -webkit-mask-image: var(--hero-mask-nodes);
+    mask-image: var(--hero-mask-nodes);
+  }
+  .hero-bg__accents {
+    position: absolute;
+    inset: 0;
+    color: var(--hero-pattern-color);
+    background-image:
+      url("/hero-accent-ring.svg"),
+      url("/hero-accent-arc.svg");
+    background-repeat: no-repeat;
+    background-position: 74% 44%, 90% 8%;
+    background-size: 420px 420px, 240px 240px;
+  }
+  .hero-bg__glow {
+    position: absolute;
+    inset: 0;
+  }
+  .hero-bg__glow--primary {
+    background-image: var(--hero-glow-primary);
+  }
+  .hero-bg__glow--secondary {
+    background-image: var(--hero-glow-secondary);
+  }
+  .hero-bg__glow--tertiary {
+    background-image: var(--hero-glow-tertiary);
+  }
+  .hero-bg__vignette {
+    position: absolute;
+    inset: 0;
+    background-image: var(--hero-vignette);
+  }
+}
+
+/* Below lg the copy stacks above the card, so masks flip to
+   bottom-anchored: all decoration stays under the text block.
+   Accents hide and the primary glow moves down behind the card. */
+@media (max-width: 1023px) {
+  :root {
+    --hero-mask-mesh: linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 62%,
+      black 100%
+    );
+    --hero-mask-nodes: linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 72%,
+      black 100%
+    );
+    --hero-mask-dots: linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 64%,
+      black 100%
+    );
+  }
+  .hero-bg__accents {
+    display: none;
+  }
+  :root {
+    --hero-glow-primary: radial-gradient(
+      62% 58% at 50% 60%,
+      oklch(0.87 0.065 300 / 0.45) 0%,
+      oklch(0.87 0.065 300 / 0.13) 55%,
+      transparent 80%
+    );
   }
 }

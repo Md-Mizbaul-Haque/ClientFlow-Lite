@@ -1,9 +1,10 @@
 "use client";
+import { ClientFlowIcon } from "@/components/icons";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import * as React from "react";
 import Link from "next/link";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarDays, FolderKanban, LoaderCircle, Plus } from "lucide-react";
+
 import { toast } from "sonner";
 import { useRealtime } from "@/components/use-realtime";
 import { StatusBadge } from "@/components/status-badge";
@@ -118,7 +119,7 @@ export default function AdminProjectsPage() {
           </p>
         </div>
         <Button onClick={() => setOpen(true)}>
-          <Plus className="size-4" />
+          <ClientFlowIcon name="plus" size={16} />
           New project
         </Button>
       </div>
@@ -140,12 +141,12 @@ export default function AdminProjectsPage() {
 
         {!isLoading && data?.length === 0 && (
           <Card className="col-span-full py-12 text-center">
-            <FolderKanban className="text-muted-foreground mx-auto mb-3 size-8" />
+            <ClientFlowIcon name="project" size={32} className="text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground text-sm">
               No projects yet. Create one to start tracking milestones.
             </p>
             <Button size="sm" className="mt-4" onClick={() => setOpen(true)}>
-              <Plus className="size-4" />
+              <ClientFlowIcon name="plus" size={16} />
               New project
             </Button>
           </Card>
@@ -225,7 +226,7 @@ export default function AdminProjectsPage() {
                 Cancel
               </Button>
               <Button type="submit" disabled={saving}>
-                {saving && <LoaderCircle className="size-4 animate-spin" />}
+                {saving && <ClientFlowIcon name="loader" size={16} className="animate-spin" />}
                 Create project
               </Button>
             </DialogFooter>
@@ -251,7 +252,7 @@ function CardBody({ project }: { project: ProjectRow }) {
       )}
       <div className="text-muted-foreground flex items-center justify-between text-xs">
         <span className="flex items-center gap-1.5">
-          <CalendarDays className="size-3.5" />
+          <ClientFlowIcon name="calendar" size={14} />
           {project.dueDate ? formatDate(project.dueDate) : "No due date"}
         </span>
         <span>{project.milestoneCount} milestones</span>

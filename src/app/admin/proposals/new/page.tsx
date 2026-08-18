@@ -1,21 +1,11 @@
 "use client";
+import { ClientFlowIcon } from "@/components/icons";
+import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  FilePlus2,
-  GripVertical,
-  ListChecks,
-  LoaderCircle,
-  Plus,
-  Save,
-  Sparkles,
-  Trash2,
-} from "lucide-react";
+
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -129,7 +119,7 @@ export default function NewProposalPage() {
         <div className="flex items-center gap-3">
           <Button asChild variant="ghost" size="icon">
             <Link href="/admin/proposals">
-              <ArrowLeft className="size-4" />
+              <ClientFlowIcon name="arrow-left" size={16} />
             </Link>
           </Button>
           <div>
@@ -138,7 +128,7 @@ export default function NewProposalPage() {
           </div>
         </div>
         <Button type="submit" disabled={saving}>
-          {saving ? <LoaderCircle className="size-4 animate-spin" /> : <Save className="size-4" />}
+          {saving ? <ClientFlowIcon name="loader" size={16} className="animate-spin" /> : <ClientFlowIcon name="save" size={16} />}
           Save proposal
         </Button>
       </div>
@@ -208,7 +198,7 @@ export default function NewProposalPage() {
             size="sm"
             onClick={() => setScope([...scope, { title: "", description: "" }])}
           >
-            <Plus className="size-4" />
+            <ClientFlowIcon name="plus" size={16} />
             Add item
           </Button>
         </CardHeader>
@@ -216,7 +206,7 @@ export default function NewProposalPage() {
           {scope.map((item, i) => (
             <div key={i} className="border-border/60 bg-muted/30 rounded-lg border p-3">
               <div className="flex items-center gap-2">
-                <GripVertical className="text-muted-foreground size-4 shrink-0" />
+                <ClientFlowIcon name="grip" size={16} className="text-muted-foreground shrink-0" />
                 <Input
                   placeholder={`Scope item ${i + 1} — e.g. Discovery & research`}
                   value={item.title}
@@ -230,7 +220,7 @@ export default function NewProposalPage() {
                     className="text-muted-foreground hover:text-destructive"
                     onClick={() => removeItem(scope, setScope, i)}
                   >
-                    <Trash2 className="size-4" />
+                    <ClientFlowIcon name="trash" size={16} />
                   </Button>
                 )}
               </div>
@@ -257,7 +247,7 @@ export default function NewProposalPage() {
             size="sm"
             onClick={() => setDeliverables([...deliverables, { title: "", description: "" }])}
           >
-            <Plus className="size-4" />
+            <ClientFlowIcon name="plus" size={16} />
             Add deliverable
           </Button>
         </CardHeader>
@@ -265,7 +255,7 @@ export default function NewProposalPage() {
           {deliverables.map((item, i) => (
             <div key={i} className="border-border/60 bg-muted/30 rounded-lg border p-3">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="text-primary size-4 shrink-0" />
+                <ClientFlowIcon name="check-circle" size={16} className="text-primary shrink-0" />
                 <Input
                   placeholder={`Deliverable ${i + 1} — e.g. 12 page templates`}
                   value={item.title}
@@ -279,7 +269,7 @@ export default function NewProposalPage() {
                     className="text-muted-foreground hover:text-destructive"
                     onClick={() => removeItem(deliverables, setDeliverables, i)}
                   >
-                    <Trash2 className="size-4" />
+                    <ClientFlowIcon name="trash" size={16} />
                   </Button>
                 )}
               </div>
@@ -334,7 +324,7 @@ export default function NewProposalPage() {
         <CardHeader className="flex-row items-center justify-between gap-3">
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="size-4" />
+              <ClientFlowIcon name="sparkles" size={16} />
               Terms
             </CardTitle>
             <CardDescription>Dynamic terms the client agrees to when signing.</CardDescription>
@@ -345,7 +335,7 @@ export default function NewProposalPage() {
             size="sm"
             onClick={() => setTerms([...terms, { title: "", description: "" }])}
           >
-            <Plus className="size-4" />
+            <ClientFlowIcon name="plus" size={16} />
             Add term
           </Button>
         </CardHeader>
@@ -358,7 +348,7 @@ export default function NewProposalPage() {
           {terms.map((item, i) => (
             <div key={i} className="border-border/60 bg-muted/30 rounded-lg border p-3">
               <div className="flex items-center gap-2">
-                <ListChecks className="text-muted-foreground size-4 shrink-0" />
+                <ClientFlowIcon name="task" size={16} className="text-muted-foreground shrink-0" />
                 <Input
                   placeholder={`Term ${i + 1} — e.g. Payment schedule`}
                   value={item.title}
@@ -371,7 +361,7 @@ export default function NewProposalPage() {
                   className="text-muted-foreground hover:text-destructive"
                   onClick={() => removeItem(terms, setTerms, i)}
                 >
-                  <Trash2 className="size-4" />
+                  <ClientFlowIcon name="trash" size={16} />
                 </Button>
               </div>
               <Textarea
@@ -393,7 +383,7 @@ export default function NewProposalPage() {
           <Link href="/admin/proposals">Cancel</Link>
         </Button>
         <Button type="submit" disabled={saving}>
-          {saving ? <LoaderCircle className="size-4 animate-spin" /> : <FilePlus2 className="size-4" />}
+          {saving ? <ClientFlowIcon name="loader" size={16} className="animate-spin" /> : <ClientFlowIcon name="file-plus" size={16} />}
           Create proposal
         </Button>
       </div>

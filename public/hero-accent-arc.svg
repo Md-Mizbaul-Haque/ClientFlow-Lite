@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" fill="none">
+  <!-- ClientFlow Lite hero arc accent: dashed quarter arc with a small plus and
+       connection dot, floating near the top-right corner. -->
+  <g stroke="currentColor" stroke-linecap="round">
+    <path d="M36 204a168 168 0 0 1 168 -168" stroke-width="1.2" stroke-dasharray="2 14" />
+    <path d="M204 36v14M197 43h14" stroke-width="1.2" />
+    <circle cx="36" cy="204" r="2" fill="currentColor" stroke="none" />
+    <path d="M36 204v20" stroke-width="1.1" />
+  </g>
+</svg>

@@ -1,13 +1,13 @@
-"use client";
+﻿"use client";
+import { ClientFlowIcon, IconContainer } from "@/components/icons";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
 import * as React from "react";
 import Link from "next/link";
-import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { AlertCircle, ArrowLeft, LinkIcon, LoaderCircle, Mail, Send } from "lucide-react";
+
 import { toast } from "sonner";
 import { Brand } from "@/components/brand";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,14 +66,13 @@ function MagicLinkForm() {
       <div className="relative flex w-full max-w-md flex-col">
         <div className="mb-8 flex items-center justify-between">
           <Brand />
-          <ThemeToggle />
         </div>
 
         <Card className="border-border/60 bg-card/90 shadow-xl backdrop-blur">
           <CardHeader>
-            <div className="bg-primary/10 text-primary mb-2 flex size-11 items-center justify-center rounded-xl">
-              <Mail className="size-5" />
-            </div>
+            <IconContainer variant="ring" boxSize={44} className="mb-2">
+              <ClientFlowIcon name="mail" size={20} className="text-primary" />
+            </IconContainer>
             <CardTitle className="text-2xl">Client sign in</CardTitle>
             <CardDescription>
               Enter the email your agency has on file. We&apos;ll email you a secure sign-in link.
@@ -90,7 +89,7 @@ function MagicLinkForm() {
             {sent ? (
               <div className="flex flex-col items-center gap-3 py-4 text-center">
                 <div className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex size-12 items-center justify-center rounded-full">
-                  <Send className="size-5" />
+                  <ClientFlowIcon name="send" size={20} />
                 </div>
                 <h3 className="font-semibold">Check your inbox</h3>
                 <p className="text-muted-foreground text-sm">
@@ -101,7 +100,7 @@ function MagicLinkForm() {
                   <div className="mt-2 w-full space-y-2">
                     <div className="bg-muted rounded-lg p-3 text-left">
                       <p className="text-muted-foreground mb-1 flex items-center gap-1.5 text-xs font-medium">
-                        <AlertCircle className="size-3.5" /> Development mode
+                        <ClientFlowIcon name="alert" size={14} /> Development mode
                       </p>
                       <p className="text-muted-foreground text-xs">
                         No SMTP is configured, so here&apos;s your one-time sign-in link:
@@ -109,7 +108,7 @@ function MagicLinkForm() {
                     </div>
                     <Button asChild variant="outline" className="w-full">
                       <a href={devUrl}>
-                        <LinkIcon className="size-4" />
+                        <ClientFlowIcon name="link" size={16} />
                         Open sign-in link
                       </a>
                     </Button>
@@ -130,7 +129,7 @@ function MagicLinkForm() {
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="email">Email</Label>
                   <div className="relative">
-                    <Mail className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                    <ClientFlowIcon name="mail" size={16} className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2" />
                     <Input
                       id="email"
                       type="email"
@@ -144,7 +143,7 @@ function MagicLinkForm() {
                   </div>
                 </div>
                 <Button type="submit" className="mt-1 w-full" disabled={loading}>
-                  {loading ? <LoaderCircle className="size-4 animate-spin" /> : <Send className="size-4" />}
+                  {loading ? <ClientFlowIcon name="loader" size={16} className="animate-spin" /> : <ClientFlowIcon name="send" size={16} />}
                   Send sign-in link
                 </Button>
               </form>
@@ -154,7 +153,7 @@ function MagicLinkForm() {
 
         <Button variant="link" asChild className="mt-4 w-fit self-center">
           <Link href="/login">
-            <ArrowLeft className="size-4" />
+            <ClientFlowIcon name="arrow-left" size={16} />
             Agency? Sign in with a password
           </Link>
         </Button>

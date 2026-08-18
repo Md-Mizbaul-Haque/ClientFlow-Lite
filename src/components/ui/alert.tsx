@@ -1,7 +1,7 @@
 "use client";
-
+import { ClientFlowIcon } from "@/components/icons";
 import * as React from "react";
-import { CircleAlert, CircleCheck, Info, TriangleAlert } from "lucide-react";
+
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -26,18 +26,17 @@ const alertVariants = cva(
 );
 
 const ICONS = {
-  default: Info,
-  destructive: CircleAlert,
-  warning: TriangleAlert,
-  success: CircleCheck,
-};
+  default: "alert",
+  destructive: "alert",
+  warning: "alert",
+  success: "check-circle",
+} as const;
 
 function Alert({
   className,
   variant,
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
-  const Icon = ICONS[variant ?? "default"];
   return (
     <div
       data-slot="alert"
@@ -45,7 +44,7 @@ function Alert({
       className={cn(alertVariants({ variant }), className)}
       {...props}
     >
-      <Icon />
+      <ClientFlowIcon name={ICONS[variant ?? "default"]} />
       {props.children}
     </div>
   );

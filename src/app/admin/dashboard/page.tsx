@@ -1,16 +1,10 @@
-"use client";
+﻿"use client";
+import { ClientFlowIcon, IconContainer, type IconName } from "@/components/icons";
+import { useQuery } from "@tanstack/react-query";
 
 import * as React from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import {
-  ArrowUpRight,
-  Banknote,
-  CalendarClock,
-  FileText,
-  FolderKanban,
-  Users,
-} from "lucide-react";
+
 import {
   Area,
   AreaChart,
@@ -93,32 +87,32 @@ export default function AdminDashboardPage() {
     { name: "Completed", value: data.projectStatusCounts.completed },
   ].filter((d) => d.value > 0);
 
-  const stats = [
+  const stats: { label: string; value: string; icon: IconName; hint: string; href: string }[] = [
     {
       label: "Active projects",
       value: String(data.stats.activeProjects),
-      icon: FolderKanban,
+      icon: "project",
       hint: "In progress or review",
       href: "/admin/projects",
     },
     {
       label: "Pending proposals",
       value: String(data.stats.pendingProposals),
-      icon: FileText,
+      icon: "proposal",
       hint: "Awaiting signature",
       href: "/admin/proposals",
     },
     {
       label: "Revenue this month",
       value: formatCurrency(data.stats.monthlyRevenue, data.stats.currency),
-      icon: Banknote,
+      icon: "banknote",
       hint: "Paid invoices",
       href: "/admin/invoices",
     },
     {
       label: "Overdue tasks",
       value: String(data.stats.overdueTasks),
-      icon: CalendarClock,
+      icon: "calendar-clock",
       hint: "Past due date",
       href: "/admin/projects",
     },
@@ -134,13 +128,13 @@ export default function AdminDashboardPage() {
         <div className="flex gap-2">
           <Button asChild variant="outline" size="sm">
             <Link href="/admin/clients">
-              <Users className="size-4" />
+              <ClientFlowIcon name="crm" size={16} />
               {data.stats.totalClients} clients
             </Link>
           </Button>
           <Button asChild size="sm">
             <Link href="/admin/proposals/new">
-              <FileText className="size-4" />
+              <ClientFlowIcon name="proposal" size={16} />
               New proposal
             </Link>
           </Button>
@@ -158,10 +152,10 @@ export default function AdminDashboardPage() {
                   <p className="text-muted-foreground text-xs">{s.hint}</p>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <span className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-lg">
-                    <s.icon className="size-4" />
-                  </span>
-                  <ArrowUpRight className="text-muted-foreground size-4 opacity-0 transition-opacity group-hover:opacity-100" />
+                  <IconContainer variant="crop" boxSize={36}>
+                    <ClientFlowIcon name={s.icon} size={16} className="text-primary" />
+                  </IconContainer>
+                  <ClientFlowIcon name="arrow-up-right" size={16} className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
                 </div>
               </CardContent>
             </Card>
@@ -250,7 +244,7 @@ export default function AdminDashboardPage() {
             <CardTitle className="text-base">Overdue tasks</CardTitle>
             <CardDescription>
               {data.stats.overdueTasks === 0
-                ? "Nothing overdue — great job"
+                ? "Nothing overdue Ã¢â‚¬â€ great job"
                 : `${data.stats.overdueTasks} task(s) past their due date`}
             </CardDescription>
           </CardHeader>
@@ -264,7 +258,7 @@ export default function AdminDashboardPage() {
                 {data.overdueTasks.map((t) => (
                   <div key={t.id} className="flex items-center justify-between gap-3 py-2.5">
                     <div className="flex min-w-0 items-center gap-3">
-                      <CalendarClock className="text-destructive size-4 shrink-0" />
+                      <ClientFlowIcon name="calendar-clock" size={16} className="text-destructive shrink-0" />
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">{t.title}</p>
                         {t.project && (
@@ -306,7 +300,7 @@ export default function AdminDashboardPage() {
                 {data.recentInvoices.map((inv) => (
                   <TableRow key={inv.id}>
                     <TableCell className="font-medium">{inv.number}</TableCell>
-                    <TableCell className="text-muted-foreground">{inv.client?.name ?? "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{inv.client?.name ?? "Ã¢â‚¬â€"}</TableCell>
                     <TableCell className="text-right font-medium">
                       {formatCurrency(inv.amount, inv.currency)}
                     </TableCell>

@@ -1,7 +1,5 @@
 "use client";
-
-import * as React from "react";
-import Link from "next/link";
+import { ClientFlowIcon } from "@/components/icons";
 import { useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -21,16 +19,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  ArrowLeft,
-  CalendarDays,
-  CheckCircle2,
-  GripVertical,
-  ListTodo,
-  LoaderCircle,
-  Plus,
-  Trash2,
-} from "lucide-react";
+
+import * as React from "react";
+import Link from "next/link";
+
 import { toast } from "sonner";
 import { useRealtime } from "@/components/use-realtime";
 import { Button } from "@/components/ui/button";
@@ -230,7 +222,7 @@ export default function AdminProjectBoardPage() {
         <div className="flex items-center gap-3">
           <Button asChild variant="ghost" size="icon">
             <Link href="/admin/projects">
-              <ArrowLeft className="size-4" />
+              <ClientFlowIcon name="arrow-left" size={16} />
             </Link>
           </Button>
           <div>
@@ -239,7 +231,7 @@ export default function AdminProjectBoardPage() {
               {data.client?.name} ({data.client?.company})
               {data.dueDate && (
                 <span className="ml-3 inline-flex items-center gap-1">
-                  <CalendarDays className="size-3.5" />
+                  <ClientFlowIcon name="calendar" size={14} />
                   {formatDate(data.dueDate)}
                 </span>
               )}
@@ -293,7 +285,7 @@ export default function AdminProjectBoardPage() {
         <div className="flex flex-col gap-4">
           <Card className="gap-3">
             <div className="flex items-center gap-2 px-6">
-              <Plus className="text-primary size-4" />
+              <ClientFlowIcon name="plus" size={16} className="text-primary" />
               <span className="font-semibold text-sm">Add milestone</span>
             </div>
             <div className="flex flex-col gap-2 px-6">
@@ -304,7 +296,7 @@ export default function AdminProjectBoardPage() {
                 onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addMilestone())}
               />
               <Button size="sm" onClick={addMilestone} disabled={adding || !newMilestone.trim()}>
-                {adding && <LoaderCircle className="size-4 animate-spin" />}
+                {adding && <ClientFlowIcon name="loader" size={16} className="animate-spin" />}
                 Add to board
               </Button>
             </div>
@@ -312,7 +304,7 @@ export default function AdminProjectBoardPage() {
 
           <Card className="gap-3">
             <div className="flex items-center gap-2 px-6">
-              <ListTodo className="text-primary size-4" />
+              <ClientFlowIcon name="task" size={16} className="text-primary" />
               <span className="font-semibold text-sm">Tasks</span>
             </div>
             <div className="flex flex-col gap-2 px-6">
@@ -336,12 +328,10 @@ export default function AdminProjectBoardPage() {
                   onClick={() => toggleTask(t.id, !t.completed)}
                   className="hover:bg-accent flex items-start gap-2.5 rounded-md px-3 py-2 text-left transition-colors"
                 >
-                  <CheckCircle2
-                    className={cn(
+                  <ClientFlowIcon name="check-circle" className={cn(
                       "mt-0.5 size-4 shrink-0",
                       t.completed ? "text-emerald-500" : "text-muted-foreground/40"
-                    )}
-                  />
+                    )} />
                   <span
                     className={cn(
                       "text-sm",
@@ -435,7 +425,7 @@ function SortableMilestoneCard({
             className="text-muted-foreground hover:text-destructive opacity-0 transition-opacity group-hover:opacity-100"
             aria-label="Delete milestone"
           >
-            <Trash2 className="size-3.5" />
+            <ClientFlowIcon name="trash" size={14} />
           </button>
         </div>
         {milestone.description && (
@@ -443,7 +433,7 @@ function SortableMilestoneCard({
         )}
         {milestone.dueDate && (
           <p className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
-            <CalendarDays className="size-3" />
+            <ClientFlowIcon name="calendar" size={12} />
             {formatDate(milestone.dueDate)}
           </p>
         )}
@@ -453,7 +443,7 @@ function SortableMilestoneCard({
           className="text-muted-foreground/50 hover:text-muted-foreground -mb-0.5 -mt-1 ml-auto flex w-fit cursor-grab rounded p-0.5 transition-colors"
           aria-label="Drag to reorder or move"
         >
-          <GripVertical className="size-3.5" />
+          <ClientFlowIcon name="grip" size={14} />
         </button>
       </Card>
     </div>
