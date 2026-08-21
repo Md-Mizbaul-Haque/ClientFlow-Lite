@@ -65,7 +65,7 @@ export default function Home() {
           <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:items-center">
             <div className="flex flex-col items-start gap-6">
               <span className="border-border/60 bg-card/70 text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium shadow-sm backdrop-blur">
-                <ClientFlowIcon name="sparkles" size={14} className="text-primary" />
+                <ClientFlowIcon name="portal-sparkle" size={16} className="text-primary" />
                 The client portal your agency deserves
               </span>
               <h1 className="text-4xl leading-[1.08] font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
@@ -128,19 +128,27 @@ export default function Home() {
                 </div>
                 <div className="space-y-3">
                   {[
-                    { label: "Design system & style guide", done: true },
-                    { label: "12 responsive page templates", done: true },
-                    { label: "CMS integration", done: false },
-                    { label: "Launch & training", done: false },
+                    { label: "Design system & style guide", icon: "layers" as IconName, done: true },
+                    { label: "12 responsive page templates", icon: "responsive" as IconName, done: true },
+                    { label: "CMS integration", icon: "integration" as IconName, done: false },
+                    { label: "Launch & training", icon: "rocket" as IconName, done: false },
                   ].map((item) => (
                     <div
                       key={item.label}
                       className="border-border/60 bg-muted/40 flex items-center gap-3 rounded-lg border px-3 py-2.5"
                     >
-                      <ClientFlowIcon name="approval" className={cn(
-                          "size-4 shrink-0",
-                          item.done ? "text-emerald-500" : "text-muted-foreground/40"
-                        )} />
+                      <span className="relative shrink-0">
+                        <ClientFlowIcon
+                          name={item.icon}
+                          size={16}
+                          className={item.done ? "text-foreground" : "text-muted-foreground/50"}
+                        />
+                        {item.done && (
+                          <span className="bg-emerald-500 ring-card absolute -right-1 -bottom-1 flex size-3 items-center justify-center rounded-full ring-2">
+                            <ClientFlowIcon name="check" size={7} strokeWidth={3.5} className="text-white" />
+                          </span>
+                        )}
+                      </span>
                       <span
                         className={cn(
                           "text-sm",

@@ -34,12 +34,15 @@ async function main() {
 
   const existingAdmin = await User.findOne({ email: adminEmail });
   if (!existingAdmin) {
+    const trialEndDate = new Date();
+    trialEndDate.setDate(trialEndDate.getDate() + 15);
     await User.create({
       email: adminEmail,
       name: "Agency Admin",
       role: "admin",
       company: "Northwind Studio",
       passwordHash: await hashPassword(adminPassword),
+      trialEndDate,
     });
     console.log(`✓ Admin created — ${adminEmail} / ${adminPassword}`);
   } else {

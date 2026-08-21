@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { DatabaseNotConfiguredError } from "./db";
 
-export function apiError(message: string, status = 400) {
-  return NextResponse.json({ error: message }, { status });
+export function apiError(message: string, status = 400, headers?: Record<string, string>) {
+  return NextResponse.json({ error: message }, { status, headers });
 }
 
 export function apiForbidden() {

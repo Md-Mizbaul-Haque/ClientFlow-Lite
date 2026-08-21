@@ -1,5 +1,5 @@
 ﻿import { NextRequest } from "next/server";
-import { requireClient, clientForSession } from "@/lib/auth";
+import { requireClientWithClientId } from "@/lib/auth";
 import { connectDB, isDatabaseConfigured } from "@/lib/db";
 import { Check, Proposal } from "@/lib/models";
 import { apiError, apiForbidden, apiUnauthorized, handleApiError, ok } from "@/lib/api";
@@ -8,7 +8,7 @@ import { REALTIME_EVENTS } from "@/lib/realtime-events";
 
 export async function POST(req: NextRequest, ctx: RouteContext<"/api/proposals/[id]/checks">) {
   try {
-    const session = await requireClient();
+    const session = await requireClientWithClientId();
     if (!session) return apiUnauthorized();
     const { id } = await ctx.params;
 
@@ -21,11 +21,10 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/proposals/[
     if (!isDatabaseConfigured()) return apiError("Database is not configured yet.", 503);
     await connectDB();
 
-    const clientId = await clientForSession(session);
     const proposal = await Proposal.findById(id);
     if (!proposal) return apiError("Proposal not found", 404);
 
-    if (clientId && String(proposal.clientId) !== clientId) {
+    if (String(proposal.clientId) !== session.clientId) {
       return apiForbidden();
     }
     if (itemIndex >= proposal.deliverables.length) {

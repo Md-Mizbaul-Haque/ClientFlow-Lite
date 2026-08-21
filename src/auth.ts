@@ -5,6 +5,7 @@ import { connectDB } from "./lib/db";
 import { User } from "./lib/models";
 import { verifyPassword } from "./lib/password";
 import { consumeMagicToken, ensureClientUser } from "./lib/magic-token";
+import { authRateLimit, type RequestLike } from "./lib/rate-limit";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -18,6 +19,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         try {
+          const req: RequestLike = {
+            headers: {
+              get: (name: string) => name === "x-forwarded-for" ? "unknown" : null,
+            },
+          };
+          const rl = await authRateLimit(req);
+          if (!rl.allowed) {
+            return null;
+          }
+
           if (credentials?.token) {
             // Magic-link sign-in (clients)
             const email = await consumeMagicToken(String(credentials.token));
@@ -51,6 +62,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             email: user.email,
             name: user.name,
             role: "admin",
+            trialEndDate: user.trialEndDate,
           };
         } catch (err) {
           console.error("[auth] authorize failed", err);

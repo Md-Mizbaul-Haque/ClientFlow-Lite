@@ -4,9 +4,15 @@ import { Client } from "@/lib/models";
 import { apiError, handleApiError, ok } from "@/lib/api";
 import { createMagicTokenForEmail, magicLinkUrl } from "@/lib/magic-token";
 import { magicLinkSchema } from "@/lib/validators";
+import { magicLinkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
+    const rl = await magicLinkRateLimit(req);
+    if (!rl.allowed) {
+      return apiError("Too many requests. Please try again later.", 429, { "Retry-After": String(Math.ceil((rl.resetAt - Date.now()) / 1000)) });
+    }
+
     const body = await req.json();
     const parsed = magicLinkSchema.safeParse(body);
     if (!parsed.success) {

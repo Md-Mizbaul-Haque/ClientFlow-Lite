@@ -17,6 +17,7 @@ export const authConfig = {
         token.role = (user as { role?: "admin" | "client" }).role ?? "client";
         token.clientId = (user as { clientId?: string }).clientId;
         token.name = user.name;
+        token.trialEndDate = (user as { trialEndDate?: Date }).trialEndDate;
       }
       return token;
     },
@@ -25,6 +26,7 @@ export const authConfig = {
         session.user.id = token.id as string;
         session.user.role = (token.role as "admin" | "client") ?? "client";
         session.user.clientId = token.clientId as string | undefined;
+        session.user.trialEndDate = token.trialEndDate as Date | undefined;
       }
       return session;
     },

@@ -8,6 +8,7 @@ export interface IUser extends Document {
   role: "admin" | "client";
   passwordHash?: string;
   company?: string;
+  trialEndDate?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,6 +20,7 @@ const UserSchema = new Schema<IUser>(
     role: { type: String, enum: ["admin", "client"], required: true, index: true },
     passwordHash: { type: String },
     company: { type: String, trim: true },
+    trialEndDate: { type: Date, index: true },
   },
   { timestamps: true }
 );

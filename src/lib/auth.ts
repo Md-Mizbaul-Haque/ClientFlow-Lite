@@ -12,6 +12,7 @@ export interface SessionUser {
   name: string;
   role: "admin" | "client";
   clientId?: string;
+  trialEndDate?: Date;
 }
 
 export async function getSession(): Promise<SessionUser | null> {
@@ -24,12 +25,16 @@ export async function getSession(): Promise<SessionUser | null> {
     name: user.name ?? "",
     role: user.role ?? "client",
     clientId: user.clientId,
+    trialEndDate: user.trialEndDate,
   };
 }
 
-export async function requireAdmin() {
+export async function requireAdmin(): Promise<SessionUser | null> {
   const session = await getSession();
   if (!session || session.role !== "admin") return null;
+  if (session.trialEndDate && new Date() > new Date(session.trialEndDate)) {
+    return null;
+  }
   return session;
 }
 
@@ -37,6 +42,14 @@ export async function requireClient() {
   const session = await getSession();
   if (!session || session.role !== "client") return null;
   return session;
+}
+
+export async function requireClientWithClientId(): Promise<SessionUser & { clientId: string } | null> {
+  const session = await requireClient();
+  if (!session) return null;
+  const clientId = await clientForSession(session);
+  if (!clientId) return null;
+  return { ...session, clientId };
 }
 
 /** Resolve the client document a logged-in client belongs to. */

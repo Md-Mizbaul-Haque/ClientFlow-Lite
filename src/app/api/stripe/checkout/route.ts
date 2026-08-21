@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { requireClient, clientForSession } from "@/lib/auth";
+import { requireClientWithClientId } from "@/lib/auth";
 import { connectDB, isDatabaseConfigured } from "@/lib/db";
 import { Invoice } from "@/lib/models";
 import { apiError, apiForbidden, apiUnauthorized, handleApiError, ok } from "@/lib/api";
@@ -7,7 +7,7 @@ import Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await requireClient();
+    const session = await requireClientWithClientId();
     if (!session) return apiUnauthorized();
 
     const body = await req.json();
@@ -17,10 +17,9 @@ export async function POST(req: NextRequest) {
     if (!isDatabaseConfigured()) return apiError("Database is not configured yet.", 503);
     await connectDB();
 
-    const clientId = await clientForSession(session);
     const invoice = await Invoice.findById(invoiceId);
     if (!invoice) return apiError("Invoice not found", 404);
-    if (clientId && String(invoice.clientId) !== clientId) return apiForbidden();
+    if (String(invoice.clientId) !== session.clientId) return apiForbidden();
     if (invoice.status === "paid") return apiError("This invoice is already paid", 409);
 
     const secretKey = process.env.STRIPE_SECRET_KEY;

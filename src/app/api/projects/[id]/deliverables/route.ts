@@ -1,5 +1,5 @@
 ﻿import { NextRequest } from "next/server";
-import { requireAdmin, requireClient, clientForSession } from "@/lib/auth";
+import { requireAdmin, requireClientWithClientId } from "@/lib/auth";
 import { connectDB, isDatabaseConfigured } from "@/lib/db";
 import { Deliverable, Project } from "@/lib/models";
 import { apiError, apiForbidden, apiUnauthorized, handleApiError, ok } from "@/lib/api";
@@ -36,7 +36,7 @@ const MAX_SIZE = 25 * 1024 * 1024; // 25MB
 
 export async function POST(req: NextRequest, ctx: RouteContext<"/api/projects/[id]/deliverables">) {
   try {
-    const session = (await requireAdmin()) ?? (await requireClient());
+    const session = (await requireAdmin()) ?? (await requireClientWithClientId());
     if (!session) return apiUnauthorized();
     const { id } = await ctx.params;
 
@@ -47,8 +47,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/projects/[i
     if (!project) return apiError("Project not found", 404);
 
     if (session.role === "client") {
-      const clientId = await clientForSession(session);
-      if (clientId && String(project.clientId) !== clientId) {
+      if (String(project.clientId) !== session.clientId) {
         return apiForbidden();
       }
     }

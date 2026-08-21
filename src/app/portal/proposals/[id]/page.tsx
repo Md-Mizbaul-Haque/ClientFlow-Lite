@@ -155,7 +155,7 @@ export default function PortalProposalDetailPage() {
           <AlertTitle>Proposal signed</AlertTitle>
           <AlertDescription>
             {data.signature?.name ?? "You"} accepted this proposal on{" "}
-            {formatDate(data.signature?.signedAt ?? data.sentAt)}. Your agency has been notified.
+            {formatDate(data.signature?.signedAt ?? data.sentAt ?? new Date())}. Your agency has been notified.
           </AlertDescription>
         </Alert>
       )}

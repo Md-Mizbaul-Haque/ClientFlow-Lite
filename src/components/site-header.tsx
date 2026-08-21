@@ -161,7 +161,7 @@ export function SiteHeader() {
             className="shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/20"
           >
             <Link href="/free-trial">
-              <ClientFlowIcon name="sparkles" size={16} />
+              <ClientFlowIcon name="sparkles" size={18} />
               Try it for free
             </Link>
           </Button>

@@ -9,12 +9,14 @@ declare module "next-auth" {
       email: string;
       role: "admin" | "client";
       clientId?: string;
+      trialEndDate?: Date;
     };
   }
 
   interface User {
     role: "admin" | "client";
     clientId?: string;
+    trialEndDate?: Date;
   }
 }
 
@@ -23,5 +25,6 @@ declare module "next-auth/jwt" {
     id: string;
     role: "admin" | "client";
     clientId?: string;
+    trialEndDate?: Date;
   }
 }
