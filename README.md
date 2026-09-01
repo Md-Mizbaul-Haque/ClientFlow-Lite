@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ClientFlow Lite — Reset
 
-## Getting Started
+> **Sunset Notice:** The previous version and architecture (v1) has been deprecated and removed. See [Issue #1](https://github.com/Md-Mizbaul-Haque/ClientFlow-Lite/issues/1) for context.
 
-First, run the development server:
+This repository has been reset to a clean slate. All previous code (Next.js app, `src/`, `public/`, `scripts/`, configs, etc.) was removed via PR from `chore/sunset-v1`.
+
+## History
+
+Previous code is **not lost** — it is preserved in Git history on `main` prior to this reset:
+
+- Last v1 commit: `d3c557f fix: resolve JSX parsing error in why-clientflow page`
+- Browse history: `git log --oneline` or `git checkout main~1 -- <path>`
+
+To restore a file from v1:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git checkout d3c557f -- <path>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Next Steps
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+A new project will be started from scratch on this repository. This README is a placeholder until the new architecture is initialized.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Getting Started (placeholder)
 
-## Learn More
+No application code exists yet. After scaffolding the new project:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*This reset was approved via PR review on `main`.*
