@@ -15,12 +15,22 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               <div className="absolute inset-0 bg-primary/10" />
             </div>
             <div className="flex flex-col gap-4 p-8 bg-primary">
-              {/* Logo from Figma: logo-uc2 1 275x26 */}
-              <img src="/logo.png" alt="ClientFlow Lite" className="h-[26px] w-[275px] object-contain brightness-0 invert" />
-              <p className="max-w-[620px] text-white text-[15px] leading-relaxed">
-                Join us for a seamless online experience. Access your account effortlessly. Stay secure
-                and enjoy a hassle-free journey.
-              </p>
+              {/* Brand — ClientFlow Lite (replaces Figma community logo-uc2) */}
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-primary font-bold text-sm">
+                  CF
+                </div>
+                <span className="text-lg font-bold tracking-tight text-white">ClientFlow Lite</span>
+                <span className="rounded bg-white/20 px-2 py-0.5 text-xs font-medium text-white">Portal</span>
+              </div>
+              <div className="max-w-[620px] space-y-2">
+                <h2 className="text-xl font-semibold leading-tight text-white">
+                  Onboard clients, manage requests, and get paid — from your own branded portal.
+                </h2>
+                <p className="text-sm leading-relaxed text-white/80">
+                  White-label client portal for agencies. Replace scattered tools with one branded experience.
+                </p>
+              </div>
             </div>
           </div>
         </div>
