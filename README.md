@@ -1,35 +1,59 @@
-# ClientFlow Lite — Reset
+# ClientFlow Lite — Turborepo
 
-> **Sunset Notice:** The previous version and architecture (v1) has been deprecated and removed. See [Issue #1](https://github.com/Md-Mizbaul-Haque/ClientFlow-Lite/issues/1) for context.
+> Monorepo with **Next.js** (frontend) + **Express** (backend) powered by [Turborepo](https://turbo.build) + `pnpm` workspaces.
 
-This repository has been reset to a clean slate. All previous code (Next.js app, `src/`, `public/`, `scripts/`, configs, etc.) was removed via PR from `chore/sunset-v1`.
+## Structure
+
+```
+├── apps/
+│   ├── frontend/   # Next.js 15 + Tailwind — http://localhost:3000
+│   └── backend/    # Express 5 + TypeScript — http://localhost:5000
+├── packages/
+│   ├── types/              # @repo/types — shared zod schemas
+│   ├── ui/                 # @repo/ui — shared helpers
+│   ├── config-typescript/  # base / next / node tsconfigs
+│   └── config-eslint/      # shared eslint configs
+├── turbo.json
+└── pnpm-workspace.yaml
+```
+
+## Prerequisites
+
+- Node >= 18, `pnpm@10.33.0` (`npm i -g pnpm` if missing)
+
+## Quick Start
+
+```bash
+pnpm install
+pnpm dev          # runs both apps in parallel via turbo
+# or single app
+pnpm --filter @repo/frontend dev
+pnpm --filter @repo/backend dev
+```
+
+- Frontend: http://localhost:3000
+- Backend: http://localhost:5000/api/health  → `{ status: "ok", ... }`
+
+## Scripts (root)
+
+| Command | Description |
+|---|---|
+| `pnpm dev` | `turbo run dev` — parallel dev servers |
+| `pnpm build` | `turbo run build` — builds all workspaces |
+| `pnpm lint` | `turbo run lint` |
+| `pnpm type-check` | `turbo run type-check` |
+| `pnpm clean` | cleans `.next`, `dist`, `.turbo` |
+
+## Env Vars
+
+- `apps/frontend/.env` → `NEXT_PUBLIC_API_URL=http://localhost:5000` (see `.env.example`)
+- `apps/backend/.env` → `PORT=5000`, `CORS_ORIGIN=http://localhost:3000` (see `.env.example`)
 
 ## History
 
-Previous code is **not lost** — it is preserved in Git history on `main` prior to this reset:
+Previous single-app v1 was archived in [#1](https://github.com/Md-Mizbaul-Haque/ClientFlow-Lite/issues/1) and reset via [#2](https://github.com/Md-Mizbaul-Haque/ClientFlow-Lite/pull/2). Restore files via `git checkout d3c557f -- <path>`.
 
-- Last v1 commit: `d3c557f fix: resolve JSX parsing error in why-clientflow page`
-- Browse history: `git log --oneline` or `git checkout main~1 -- <path>`
+## Deploy Notes
 
-To restore a file from v1:
-
-```bash
-git checkout d3c557f -- <path>
-```
-
-## Next Steps
-
-A new project will be started from scratch on this repository. This README is a placeholder until the new architecture is initialized.
-
-## Getting Started (placeholder)
-
-No application code exists yet. After scaffolding the new project:
-
-```bash
-npm install
-npm run dev
-```
-
----
-
-*This reset was approved via PR review on `main`.*
+- **Frontend** deployable to Vercel (root dir `apps/frontend`)
+- **Backend** deployable to any Node host (build: `pnpm --filter @repo/backend build` → `node apps/backend/dist/index.js`)
