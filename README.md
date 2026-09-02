@@ -17,6 +17,16 @@
 └── pnpm-workspace.yaml
 ```
 
+## Design — Source of Truth
+
+> **Figma (main design reference):** [Client Portal (Community) — Figma](https://www.figma.com/design/JOvro48pHVwL7FEeOW6i3r/Client-Portal--Community-?node-id=0-1&m=dev&t=BtPMZkJQF0AoaU7L-1)
+>
+> All UI/UX work for ClientFlow Lite **must** follow this Figma file. It is the canonical source for layout, components, tokens (colors, typography, spacing, radii, shadows), and interaction patterns. Do not introduce ad-hoc styles that diverge from it — propose changes in Figma first, then implement.
+>
+> - Scope: `apps/frontend` and `packages/ui`
+> - Tokens/style guide: extract from Figma Dev Mode (`m=dev`) — do not hardcode values that exist as tokens
+> - When Figma and code conflict, Figma wins unless an ADR in `docs/adr/` records an exception
+
 ## Prerequisites
 
 - Node >= 18, `pnpm@10.33.0` (`npm i -g pnpm` if missing)
