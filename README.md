@@ -21,29 +21,23 @@ ClientFlow is a SaaS portal where each tenant (agency/studio) manages its own cl
 └── pnpm-workspace.yaml
 ```
 
-## Design — Source of Truth
+## Design
 
-> **Figma (main design reference):** [Client Portal (Community) — Figma](https://www.figma.com/design/JOvro48pHVwL7FEeOW6i3r/Client-Portal--Community-?node-id=0-1&m=dev&t=BtPMZkJQF0AoaU7L-1)
+> **Figma reference:** [Client Portal (Community) — Figma](https://www.figma.com/design/JOvro48pHVwL7FEeOW6i3r/Client-Portal--Community-?node-id=0-1&m=dev&t=BtPMZkJQF0AoaU7L-1)
 
-All UI/UX work for ClientFlow Lite **must** follow this Figma file. It is the canonical source for layout, components, tokens (colors, typography, spacing, radii, shadows), and interaction patterns. Do not introduce ad-hoc styles that diverge from it — propose changes in Figma first, then implement.
-
-- Scope: `apps/frontend` and `packages/ui`
-- Tokens: `apps/frontend/lib/tokens.ts` (derived from 185 Figma styles) → `tailwind.config.ts` + `app/globals.css`
-- When Figma and code conflict, Figma wins unless an ADR in `docs/adr/` records an exception
+Figma is the source of truth for layout, components, and tokens (colors, typography, spacing, radii, shadows). Tokens live in `apps/frontend/lib/tokens.ts` and are mapped to `tailwind.config.ts` + `app/globals.css`.
 
 ## Why this stack
 
-We picked boring, proven tools that fit a multi-tenant portal on a $0 budget and still scale when you can pay.
-
 **Turborepo + pnpm workspaces** — one repo for both apps. Shared `@repo/types` (zod) keeps frontend/backend contracts in sync, `turbo run dev` runs both apps in parallel.
 
-**Next.js 15 + Tailwind 4** — Vercel-native for `apps/frontend`, App Router, `Manrope` tokens from Figma (`F1F2F4` borders, `#005EB8` primary) mapped to CSS variables, not hardcoded.
+**Next.js 15 + Tailwind 4** — Vercel-native for `apps/frontend`, App Router, design tokens (`#005EB8` primary) as CSS variables.
 
-**Express 5 + TypeScript** — unopinionated for `apps/backend` (`helmet`, `cors`, `zod` at boundaries, thin controllers → `lib/*`). Easy to add `tenantGuard` middleware that injects `tenantId` from auth.
+**Express 5 + TypeScript** — unopinionated for `apps/backend` (`helmet`, `cors`, `zod` at boundaries, thin controllers → `lib/*`). Tenant isolation via `tenantId` middleware.
 
-**TypeScript strict** — shared configs in `packages/config-typescript` (`base`/`next`/`node`), no `any`.
+**TypeScript strict** — shared configs in `packages/config-typescript`.
 
-**PostgreSQL (Neon Free → Railway Postgres when funded)** — your data is relational and needs ACID: `clients → projects → invoices` with FKs, `DECIMAL` for money, and `tenant_id` isolation. Postgres gives Row-Level Security as a safety net; `JSONB` later for flexible fields and `pgvector` for search. At $0, Neon Free (0.5GB, scale-to-zero, branch per PR) via `DATABASE_URL`; when funded, switch `DATABASE_URL` to Railway private Postgres (`postgres.railway.internal`) with zero code change. Supabase Free is the alternative if you want Auth/Storage included.
+**PostgreSQL + Prisma** — relational data (`clients → projects → invoices`) with FKs, `DECIMAL` for money, and `tenant_id` isolation with Row-Level Security.
 
 ## What we’re using
 
@@ -53,8 +47,8 @@ We picked boring, proven tools that fit a multi-tenant portal on a $0 budget and
 | Frontend | Next.js 15, Tailwind 4, Manrope | `apps/frontend` |
 | Backend | Express 5, `tsx`, `zod`, `helmet`, `cors`, `morgan` | `apps/backend/src/index.ts` |
 | Shared | `@repo/types` (zod), `@repo/ui`, `@repo/config-*` | `packages/*` |
-| DB (planned) | PostgreSQL + Prisma (`packages/db`) | `DATABASE_URL` / `DIRECT_URL` |
-| Deploy | Frontend: Vercel Free, Backend: Railway Free, DB: Neon Free | See below |
+| DB | PostgreSQL + Prisma | `packages/db` (`DATABASE_URL`) |
+| Deploy | Vercel (frontend) + Railway (backend) + PostgreSQL | See below |
 
 ## Prerequisites
 
@@ -86,14 +80,10 @@ pnpm --filter @repo/backend dev   # http://localhost:5000
 ## Env Vars
 
 - `apps/frontend/.env` → `NEXT_PUBLIC_API_URL=http://localhost:5000` (see `.env.example`)
-- `apps/backend/.env` → `PORT=5000`, `CORS_ORIGIN=http://localhost:3000`, `DATABASE_URL` (Neon pooled URL) (see `.env.example`)
+- `apps/backend/.env` → `PORT=5000`, `CORS_ORIGIN=http://localhost:3000`, `DATABASE_URL` (see `.env.example`)
 
-## Deploy — $0
+## Deploy
 
-- **Frontend:** Vercel Free — set Root Directory `apps/frontend`, env `NEXT_PUBLIC_API_URL` → your Railway backend URL
-- **Backend:** Railway Free ($5 credit, sleeps when idle) — set `DATABASE_URL` to Neon Free pooled URL, `DIRECT_URL` to direct URL; start `prisma migrate deploy && node dist/index.js`
-- **DB:** Neon Free (0.5GB, scale-to-zero) — branch per feature; when funded, create Railway Postgres service and change `DATABASE_URL` to `DATABASE_PRIVATE_URL` (`postgres.railway.internal`)
-
-## History
-
-Previous single-app v1 was archived in [#1](https://github.com/Md-Mizbaul-Haque/ClientFlow-Lite/issues/1) and reset via [#2](https://github.com/Md-Mizbaul-Haque/ClientFlow-Lite/pull/2). Restore files via `git checkout d3c557f -- <path>`. Tokens added in [#4](https://github.com/Md-Mizbaul-Haque/ClientFlow-Lite/pull/4).
+- **Frontend:** Vercel — Root Directory `apps/frontend`, env `NEXT_PUBLIC_API_URL` → backend URL
+- **Backend:** Railway — env `DATABASE_URL`, `CORS_ORIGIN`; start `prisma migrate deploy && node dist/index.js`
+- **DB:** PostgreSQL (Neon/Supabase/Railway Postgres) — `DATABASE_URL` / `DIRECT_URL`
