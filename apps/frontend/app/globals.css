@@ -39,6 +39,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Fix Chrome/Safari autofill — removes yellow/blue background on inputs */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #111827;
+  transition: background-color 5000s ease-in-out 0s;
+}
+input:autofill {
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+}
+
 /* Figma layout helpers */
 .container-form {
   max-width: 480px;

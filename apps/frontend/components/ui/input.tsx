@@ -14,12 +14,12 @@ export function Input({ label, requiredMark, error, ...props }: InputProps) {
         {requiredMark && <span className="text-error text-sm">*</span>}
       </div>
       <div
-        className={`flex items-center gap-2 rounded-lg border bg-bg-input px-4 h-[56px] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${
+        className={`flex items-center gap-2 rounded-lg border bg-white px-4 h-[56px] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${
           error ? "border-error" : "border-border"
         }`}
       >
         <input
-          className="flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
+          className="flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none autofill:bg-white"
           {...props}
         />
       </div>
