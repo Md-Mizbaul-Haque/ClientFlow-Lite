@@ -1,5 +1,6 @@
 "use client";
 
+import { Check } from "lucide-react";
 import * as React from "react";
 
 type CheckboxProps = {
@@ -21,14 +22,12 @@ export function Checkbox({ checked, onCheckedChange, label, id }: CheckboxProps)
           onChange={(e) => onCheckedChange?.(e.target.checked)}
           className="peer h-5 w-5 appearance-none rounded border border-border-strong bg-white checked:bg-primary checked:border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
         />
-        <svg
-          className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
-          viewBox="0 0 12 10"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M1 5L4.5 8.5L11 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <Check
+          size={12}
+          strokeWidth={3}
+          aria-hidden="true"
+          className="pointer-events-none absolute hidden text-white peer-checked:block"
+        />
       </div>
       {label && <span className="text-sm text-neutral-700">{label}</span>}
     </label>
