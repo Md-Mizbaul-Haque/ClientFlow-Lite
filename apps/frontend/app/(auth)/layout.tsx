@@ -1,3 +1,5 @@
+import { BrandLogo } from "@/components/brand-logo";
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen w-full bg-white">
@@ -15,14 +17,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               <div className="absolute inset-0 bg-primary/10" />
             </div>
             <div className="flex flex-col gap-4 p-8 bg-primary">
-              {/* Brand — ClientFlow Lite (replaces Figma community logo-uc2) */}
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-primary font-bold text-sm">
-                  CF
-                </div>
-                <span className="text-lg font-bold tracking-tight text-white">ClientFlow Lite</span>
-                <span className="rounded bg-white/20 px-2 py-0.5 text-xs font-medium text-white">Portal</span>
-              </div>
+              {/* Brand — main ClientFlow Lite logo, white box for contrast on blue */}
+              <BrandLogo variant="onBlue" />
               <div className="max-w-[620px] space-y-2">
                 <h2 className="text-xl font-semibold leading-tight text-white">
                   Onboard clients, manage requests, and get paid — from your own branded portal.
@@ -37,7 +33,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         {/* Right — Form area (720) */}
         <div className="flex flex-1 items-center justify-center bg-white px-6 py-10 lg:w-[720px]">
-          <div className="w-full max-w-[480px]">{children}</div>
+          <div className="flex w-full max-w-[480px] flex-col gap-8">
+            <div className="lg:hidden">
+              <BrandLogo variant="onWhite" />
+            </div>
+            {children}
+          </div>
         </div>
       </div>
     </div>
