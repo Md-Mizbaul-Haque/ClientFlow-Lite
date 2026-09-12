@@ -1,35 +1,41 @@
 import "dotenv/config";
-import cors from "cors";
-import express from "express";
-import helmet from "helmet";
-import morgan from "morgan";
 
-import { errorHandler, notFoundHandler } from "./middleware/error.js";
-import authRouter from "./routes/auth.js";
-import healthRouter from "./routes/health.js";
+import { app } from "./app.js";
+import { env } from "./lib/env.js";
+import { logger } from "./lib/logger.js";
+import { prisma } from "./lib/prisma.js";
 
-const app = express();
-const port = Number(process.env.PORT ?? 5000);
-
-app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN ?? "http://localhost:3000", credentials: true }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"));
-
-app.get("/", (_req, res) => {
-  res.json({ name: "@repo/backend", status: "ok", docs: "/api/health" });
+const server = app.listen(env.PORT, () => {
+  logger.info("server_listening", { port: env.PORT, env: env.NODE_ENV });
 });
 
-app.use("/api/health", healthRouter);
-app.use("/api/auth", authRouter);
+// Platforms send SIGTERM before killing the container. Stop accepting
+// connections, let in-flight requests finish, then drop the DB pool.
+function shutdown(signal: NodeJS.Signals): void {
+  logger.info("server_shutdown_started", { signal });
+  server.close((err) => {
+    if (err) {
+      logger.error("server_shutdown_failed", { message: err.message });
+      process.exitCode = 1;
+    }
+    void prisma.$disconnect().finally(() => process.exit());
+  });
+  // Don't hang forever on a stuck connection.
+  setTimeout(() => process.exit(1), 10_000).unref();
+}
 
-// 404 + error handler must be last
-app.use(notFoundHandler);
-app.use(errorHandler);
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
 
-app.listen(port, () => {
-  console.log(`[backend] listening at http://localhost:${port}`);
+// A process in an unknown state must not keep serving traffic. Log the cause and
+// let the platform restart us — silent continuation is how data gets corrupted.
+process.on("unhandledRejection", (reason) => {
+  logger.error("unhandled_rejection", { message: reason instanceof Error ? reason.message : String(reason) });
+  process.exit(1);
+});
+process.on("uncaughtException", (error) => {
+  logger.error("uncaught_exception", { message: error.message, stack: error.stack });
+  process.exit(1);
 });
 
 export default app;
