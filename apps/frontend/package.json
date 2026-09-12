@@ -13,6 +13,7 @@
   "dependencies": {
     "lucide-react": "^1.44.0",
     "next": "^15.5.2",
+    "nextjs-toploader": "^3.9.17",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "zod": "^4.5.4"

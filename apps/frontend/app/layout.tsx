@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,7 +23,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <NextTopLoader
+          color="#005EB8"
+          height={3}
+          showSpinner={false}
+          showForHashAnchor={false}
+          shadow="0 0 10px #005EB8,0 0 5px #005EB8"
+        />
+        {children}
+      </body>
     </html>
   );
 }
