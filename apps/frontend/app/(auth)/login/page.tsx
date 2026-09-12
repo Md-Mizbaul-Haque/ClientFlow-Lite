@@ -1,7 +1,9 @@
 "use client";
 
+import { LoginSchema } from "@repo/types";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 
 import { AppleIcon, GoogleIcon } from "@/components/brand-icons";
@@ -9,10 +11,44 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Divider } from "@/components/ui/divider";
 import { Input } from "@/components/ui/input";
+import { login, saveSession } from "@/lib/api";
+import { toFieldErrors, type FieldErrors } from "@/lib/validation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [remember, setRemember] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [sending, setSending] = React.useState(false);
+  const [formError, setFormError] = React.useState<string | null>(null);
+  const [errors, setErrors] = React.useState<FieldErrors>({});
+
+  function clearError(key: string) {
+    setErrors((prev) => (prev[key] === undefined ? prev : { ...prev, [key]: undefined }));
+  }
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (sending) return;
+    const parsed = LoginSchema.safeParse({ email, password });
+    if (!parsed.success) {
+      setErrors(toFieldErrors(parsed.error));
+      return;
+    }
+    setErrors({});
+    setSending(true);
+    setFormError(null);
+    try {
+      const res = await login(parsed.data);
+      saveSession(res.token);
+      router.push("/dashboard");
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setSending(false);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -22,26 +58,27 @@ export default function LoginPage() {
         <p className="text-sm text-neutral-500">Welcome back — please enter your details.</p>
       </div>
 
-      {/* Form — UI only, no backend */}
-      <form
-        className="flex flex-col gap-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          // UI only — frontend engineer mock
-          alert("UI only: form data would be validated with zod and sent to /api/auth/login");
-        }}
-      >
+      {/* Form */}
+      <form className="flex flex-col gap-4" onSubmit={handleLogin}>
+        {formError ? (
+          <p role="alert" className="rounded-lg border border-error bg-[#FDECEC] px-4 py-3 text-sm text-error">
+            {formError}
+          </p>
+        ) : null}
         <Input label="Organisation Reference" requiredMark placeholder="Organisation reference" />
-        <Input label="Email" requiredMark placeholder="Input your registered email" type="email" />
+        <Input label="Email" requiredMark placeholder="Input your registered email" type="email" value={email} error={errors.email} onChange={(e) => { setEmail(e.target.value); clearError("email"); }} />
         <div className="flex flex-col gap-[6px]">
           <div className="flex items-center gap-1">
             <label className="text-sm font-medium text-neutral-700">Password</label>
             <span className="text-error text-sm">*</span>
           </div>
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-white px-4 h-[56px] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+          <div className={`flex items-center gap-2 rounded-lg border bg-white px-4 h-[56px] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${errors.password ? "border-error" : "border-border"}`}>
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Input your password"
+              value={password}
+              aria-invalid={errors.password !== undefined}
+              onChange={(e) => { setPassword(e.target.value); clearError("password"); }}
               className="flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none autofill:bg-white"
             />
             <button
@@ -58,6 +95,7 @@ export default function LoginPage() {
               )}
             </button>
           </div>
+          {errors.password ? <p className="text-xs text-error">{errors.password}</p> : null}
         </div>
 
         <div className="flex items-center justify-between py-1">
@@ -67,8 +105,8 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <Button type="submit" variant="primary">
-          Login
+        <Button type="submit" variant="primary" disabled={sending}>
+          {sending ? "Logging in…" : "Login"}
         </Button>
 
         <Divider text="Or login with" />
