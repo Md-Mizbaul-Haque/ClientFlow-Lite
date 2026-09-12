@@ -9,16 +9,20 @@ export interface AuthTokenPayload {
 
 const TOKEN_EXPIRY = "7d";
 
+// Pin the algorithm on both sides. Without this, verification trusts the token's
+// own header, which is how `alg: none` and HS/RS confusion attacks work.
+const ALGORITHM = "HS256" as const;
+
 export function signAuthToken(userId: string, agencyId: string): string {
   const payload: AuthTokenPayload = { sub: userId, agencyId };
-  return jwt.sign(payload, env.JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+  return jwt.sign(payload, env.JWT_SECRET, { algorithm: ALGORITHM, expiresIn: TOKEN_EXPIRY });
 }
 
-// Helper for future authenticated routes — throws on invalid/expired tokens.
+/** Throws on malformed, tampered, or expired tokens. Callers map the throw to 401. */
 export function verifyAuthToken(token: string): AuthTokenPayload {
-  const decoded = jwt.verify(token, env.JWT_SECRET);
+  const decoded = jwt.verify(token, env.JWT_SECRET, { algorithms: [ALGORITHM] });
   if (typeof decoded === "string" || typeof decoded.sub !== "string" || typeof decoded.agencyId !== "string") {
-    throw new Error("Invalid token");
+    throw new jwt.JsonWebTokenError("Token payload is missing required claims");
   }
   return { sub: decoded.sub, agencyId: decoded.agencyId };
 }

@@ -38,10 +38,12 @@ export const AccountInfoSchema = z.object({
   agencyName: z.string().trim().min(1, "Agency name is required").max(100),
   email: z.string().trim().toLowerCase().email("Enter a valid email").max(255),
   // Matches the signup hint: at least 8 characters, including a number.
+  // The 72 cap is bcrypt's limit — it ignores bytes past it, so a longer
+  // password would be accepted while only its first 72 bytes decide access.
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
-    .max(128)
+    .max(72, "Password must be 72 characters or fewer")
     .regex(/[0-9]/, "Password must include a number"),
 });
 
@@ -66,13 +68,14 @@ export type RegisterInput = z.infer<typeof RegisterSchema>;
 
 export const LoginSchema = z.object({
   email: z.string().trim().toLowerCase().email("Enter a valid email").max(255),
-  password: z.string().min(1, "Password is required").max(128),
+  password: z.string().min(1, "Password is required").max(72, "Password must be 72 characters or fewer"),
 });
 
 export type LoginInput = z.infer<typeof LoginSchema>;
 
 export const AuthUserSchema = z.object({
   id: z.string(),
+  agencyId: z.string(),
   agencyName: z.string(),
   email: z.string(),
 });
@@ -86,3 +89,12 @@ export const AuthResponseSchema = z.object({
 });
 
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+
+// Returned by GET /api/auth/me — the client's source of truth for "am I still
+// signed in, and who am I?" after a page reload.
+export const MeResponseSchema = z.object({
+  status: z.literal("ok"),
+  user: AuthUserSchema,
+});
+
+export type MeResponse = z.infer<typeof MeResponseSchema>;
