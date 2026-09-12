@@ -42,25 +42,31 @@ router.post("/register", registerLimiter, async (req: Request, res: Response, ne
       // No pre-flight email check: two concurrent requests both pass it and the
       // loser still hits the unique index. Let the database be the arbiter and
       // translate its violation into a clean 409.
-      created = await prisma.$transaction(async (tx) => {
-        const agency = await tx.agency.create({
-          data: {
-            name: data.agencyName,
-            website: data.website ? data.website : null,
-            serviceType: data.serviceType,
-            serviceDetail: data.serviceDetail ? data.serviceDetail : null,
-            teamSize: data.teamSize,
-          },
-        });
-        const user = await tx.user.create({
-          data: {
-            agencyId: agency.id,
-            email: data.email,
-            passwordHash,
-          },
-        });
-        return { agency, user };
-      });
+      // Generous timeouts: Neon free-tier sleeps after inactivity and a first
+      // wake takes ~12s, well past Prisma's 5s interactive-transaction default.
+      // Without this every register on a cold database 500s.
+      created = await prisma.$transaction(
+        async (tx) => {
+          const agency = await tx.agency.create({
+            data: {
+              name: data.agencyName,
+              website: data.website ? data.website : null,
+              serviceType: data.serviceType,
+              serviceDetail: data.serviceDetail ? data.serviceDetail : null,
+              teamSize: data.teamSize,
+            },
+          });
+          const user = await tx.user.create({
+            data: {
+              agencyId: agency.id,
+              email: data.email,
+              passwordHash,
+            },
+          });
+          return { agency, user };
+        },
+        { maxWait: 10000, timeout: 20000 },
+      );
     } catch (err) {
       if (isUniqueConstraintError(err)) {
         res.status(409).json({ status: "error", message: "Email already registered" });
