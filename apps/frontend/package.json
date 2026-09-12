@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "rimraf .next && next dev --port 3000",
     "build": "rimraf .next && next build",
     "start": "next start --port 3000",
     "lint": "eslint .",
