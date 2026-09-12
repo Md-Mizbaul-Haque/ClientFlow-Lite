@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Divider } from "@/components/ui/divider";
 import { Input } from "@/components/ui/input";
-import { login, saveSession } from "@/lib/api";
+import { login } from "@/lib/api";
+import { saveSession } from "@/lib/session";
 import { toFieldErrors, type FieldErrors } from "@/lib/validation";
 
 export default function LoginPage() {
@@ -41,8 +42,10 @@ export default function LoginPage() {
     setFormError(null);
     try {
       const res = await login(parsed.data);
-      saveSession(res.token);
-      router.push("/dashboard");
+      saveSession(res.token, remember);
+      // replace, not push: the login form must not be one back-button press away
+      // from an authenticated portal.
+      router.replace("/dashboard");
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -65,7 +68,6 @@ export default function LoginPage() {
             {formError}
           </p>
         ) : null}
-        <Input label="Organisation Reference" requiredMark placeholder="Organisation reference" />
         <Input label="Email" requiredMark placeholder="Input your registered email" type="email" value={email} error={errors.email} onChange={(e) => { setEmail(e.target.value); clearError("email"); }} />
         <div className="flex flex-col gap-[6px]">
           <div className="flex items-center gap-1">

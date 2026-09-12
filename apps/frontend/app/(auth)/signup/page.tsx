@@ -11,7 +11,8 @@ import { AppleIcon, GoogleIcon } from "@/components/brand-icons";
 import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/ui/divider";
 import { Input } from "@/components/ui/input";
-import { register, saveSession } from "@/lib/api";
+import { register } from "@/lib/api";
+import { saveSession } from "@/lib/session";
 import { toFieldErrors, type FieldErrors } from "@/lib/validation";
 
 const Step1Schema = AccountInfoSchema;
@@ -25,6 +26,19 @@ const SERVICE_OPTIONS = [
 ];
 
 const TEAM_SIZES = ["1-5", "6-20", "21-50", "50+"];
+
+const SCHEME_PREFIX = /^[a-z][a-z0-9+.-]*:\/\//i;
+
+// The field renders a fixed https:// prefix and accepts a host, so a value pasted
+// with a scheme is normalized rather than stored half-qualified.
+function stripScheme(value: string): string {
+  return value.trim().replace(SCHEME_PREFIX, "");
+}
+
+function normalizeWebsite(value: string): string | undefined {
+  const host = stripScheme(value);
+  return host === "" ? undefined : `https://${host}`;
+}
 
 export default function SignupPage() {
   const router = useRouter();
@@ -64,9 +78,10 @@ export default function SignupPage() {
       agencyName,
       email,
       password,
-      website: website === "" ? undefined : website,
+      website: normalizeWebsite(website),
       serviceType: (service === "" ? undefined : service) as ServiceType | undefined,
-      serviceDetail: serviceDetail === "" ? undefined : serviceDetail,
+      // Only meaningful for "Other (specify)" — otherwise it is noise in the record.
+      serviceDetail: service === "Other (specify)" && serviceDetail !== "" ? serviceDetail : undefined,
       teamSize: (teamSize === "" ? undefined : teamSize) as TeamSize | undefined,
     });
     const fieldErrors: FieldErrors = parsed.success ? {} : toFieldErrors(parsed.error);
@@ -78,8 +93,10 @@ export default function SignupPage() {
     setFormError(null);
     try {
       const res = await register(parsed.data);
-      saveSession(res.token);
-      router.push("/dashboard");
+      // Keep a new account signed in across browser restarts — it has no
+      // "remember me" control to ask with.
+      saveSession(res.token, true);
+      router.replace("/dashboard");
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Registration failed");
     } finally {
@@ -164,7 +181,7 @@ export default function SignupPage() {
               <label className="text-sm font-medium text-neutral-700">Agency Website</label>
             </div>
             <div className={`flex items-center gap-0 rounded-lg border bg-white pl-4 h-[56px] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden ${errors.website ? "border-error" : "border-border"}`}>
-              <span className="shrink-0 text-sm text-neutral-400">http://</span>
+              <span className="shrink-0 text-sm text-neutral-400">https://</span>
               <input
                 type="text"
                 inputMode="url"
@@ -172,7 +189,7 @@ export default function SignupPage() {
                 aria-label="Agency website domain"
                 aria-invalid={errors.website !== undefined}
                 value={website}
-                onChange={(e) => { setWebsite(e.target.value); clearError("website"); }}
+                onChange={(e) => { setWebsite(stripScheme(e.target.value)); clearError("website"); }}
                 className="h-full min-w-0 flex-1 bg-transparent px-1 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
               />
             </div>
