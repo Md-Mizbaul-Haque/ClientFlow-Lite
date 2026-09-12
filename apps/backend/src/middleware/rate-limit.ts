@@ -1,0 +1,22 @@
+import { rateLimit } from "express-rate-limit";
+
+// Brute-force guard: 10 logins per 10 minutes per IP is generous for humans,
+// useless for password spraying. Counts only failed logins below.
+export const loginLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  // Successful logins reset the count — only failures burn budget.
+  skipSuccessfulRequests: true,
+  message: { status: "error", message: "Too many login attempts. Please try again in a few minutes." },
+});
+
+// Registration spam guard: 20 accounts per hour per IP.
+export const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 20,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { status: "error", message: "Too many accounts created. Please try again later." },
+});
