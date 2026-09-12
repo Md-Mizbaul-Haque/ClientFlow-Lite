@@ -75,12 +75,17 @@ pnpm --filter @repo/backend dev   # http://localhost:5000
 | `pnpm build` | `turbo run build` — builds all workspaces |
 | `pnpm lint` | `turbo run lint` |
 | `pnpm type-check` | `turbo run type-check` |
+| `pnpm test` | `turbo run test` — Vitest suites (backend auth, error handling) |
 | `pnpm clean` | cleans `.next`, `dist`, `.turbo` |
 
 ## Env Vars
 
 - `apps/frontend/.env` → `NEXT_PUBLIC_API_URL=http://localhost:5000` (see `.env.example`)
-- `apps/backend/.env` → `PORT=5000`, `CORS_ORIGIN=http://localhost:3000`, `DATABASE_URL` (see `.env.example`)
+- `apps/backend/.env` → `PORT=5000`, `CORS_ORIGIN=http://localhost:3000`, `DATABASE_URL`, `JWT_SECRET` (min 32 chars — `openssl rand -base64 32`). The backend refuses to start in production on a short, placeholder, or localhost-origin config; see `apps/backend/src/lib/env.ts`.
+
+## Auth
+
+Email + password, JWT bearer tokens. `POST /api/auth/register` and `/login` return the token; `GET /api/auth/me` verifies it against the database and backs the portal guard. Routes behind `requireAuth` (`apps/backend/src/middleware/auth.ts`) reject anything without a valid `Authorization: Bearer` header. Token storage on the client and the reasoning behind it: `docs/adr/0001-auth-token-storage.md`.
 
 ## Deploy
 

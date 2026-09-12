@@ -1,5 +1,6 @@
 "use client";
 
+import { Check } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 
@@ -42,7 +43,7 @@ export default function OnboardingPage() {
                           : "bg-white border border-border text-neutral-400"
                     }`}
                   >
-                    {isCompleted ? "✓" : s.id}
+                    {isCompleted ? <Check size={14} strokeWidth={3} aria-hidden="true" /> : s.id}
                   </div>
                   <div className="hidden sm:block text-left">
                     <p className={`text-sm font-medium ${isActive ? "text-neutral-900" : "text-neutral-500"}`}>{s.title}</p>
