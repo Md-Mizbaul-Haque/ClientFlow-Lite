@@ -16,6 +16,9 @@ dist
 **/.next
 **/dist
 
+# prisma
+apps/backend/src/generated
+
 # env
 .env*
 !.env.example

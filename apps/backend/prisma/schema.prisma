@@ -1,0 +1,33 @@
+// Prisma schema for ClientFlow Lite backend (PostgreSQL).
+//
+// Connection URL is NOT stored here (deprecated in Prisma 7) — see
+// apps/backend/prisma.config.ts which loads DATABASE_URL from the env.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Agency {
+  id            String   @id @default(cuid())
+  name          String
+  website       String?
+  serviceType   String
+  serviceDetail String?
+  teamSize      String
+  createdAt     DateTime @default(now())
+  users         User[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  agencyId     String
+  agency       Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
