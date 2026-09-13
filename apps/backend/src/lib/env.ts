@@ -13,6 +13,9 @@ const EnvSchema = z
     // 32 bytes: HS256 security is bounded by the key's entropy, so a short secret
     // is brute-forceable offline from a single captured token.
     JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
+    // Separate secret for refresh tokens — compromising access token secret
+    // does not compromise refresh tokens.
+    REFRESH_TOKEN_SECRET: z.string().min(32, "REFRESH_TOKEN_SECRET must be at least 32 characters"),
   })
   .superRefine((value, ctx) => {
     if (value.NODE_ENV !== "production") return;
@@ -21,6 +24,13 @@ const EnvSchema = z
         code: z.ZodIssueCode.custom,
         path: ["JWT_SECRET"],
         message: "JWT_SECRET must be replaced before running in production",
+      });
+    }
+    if (PLACEHOLDER_SECRETS.has(value.REFRESH_TOKEN_SECRET.toLowerCase())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["REFRESH_TOKEN_SECRET"],
+        message: "REFRESH_TOKEN_SECRET must be replaced before running in production",
       });
     }
     if (value.CORS_ORIGIN.includes("localhost")) {

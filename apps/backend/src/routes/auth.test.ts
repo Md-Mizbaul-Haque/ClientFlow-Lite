@@ -5,26 +5,29 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => {
   const user = { findUnique: vi.fn() };
   const agency = { create: vi.fn() };
+  const refreshToken = { create: vi.fn(), findUnique: vi.fn(), update: vi.fn(), updateMany: vi.fn() };
   const tx = { user: { create: vi.fn() }, agency: { create: vi.fn() } };
-  return { user, agency, tx, transaction: vi.fn() };
+  return { user, agency, refreshToken, tx, transaction: vi.fn() };
 });
 
 vi.mock("../lib/prisma.js", () => ({
   prisma: {
     user: mocks.user,
     agency: mocks.agency,
+    refreshToken: mocks.refreshToken,
     $transaction: mocks.transaction,
   },
   default: {
     user: mocks.user,
     agency: mocks.agency,
+    refreshToken: mocks.refreshToken,
     $transaction: mocks.transaction,
   },
 }));
 
 const { createApp } = await import("../app.js");
 const { hashPassword } = await import("../lib/password.js");
-const { signAuthToken } = await import("../lib/jwt.js");
+const { signAccessToken } = await import("../lib/jwt.js");
 
 const app = createApp();
 
@@ -46,14 +49,19 @@ beforeEach(() => {
   mocks.agency.create.mockReset();
   mocks.tx.user.create.mockReset();
   mocks.tx.agency.create.mockReset();
+  mocks.refreshToken.create.mockReset();
+  mocks.refreshToken.findUnique.mockReset();
+  mocks.refreshToken.update.mockReset();
+  mocks.refreshToken.updateMany.mockReset();
   mocks.transaction.mockReset();
   mocks.transaction.mockImplementation(async (callback: (tx: typeof mocks.tx) => unknown) => callback(mocks.tx));
   mocks.tx.agency.create.mockResolvedValue({ id: "agency_1", name: registerBody.agencyName });
   mocks.tx.user.create.mockResolvedValue({ id: "user_1", email: registerBody.email });
+  mocks.refreshToken.create.mockResolvedValue({ id: "rt_1", userId: "user_1", token: "tok_1" });
 });
 
 describe("POST /api/auth/register", () => {
-  it("creates the agency and user, then returns a usable token", async () => {
+  it("creates the agency and user, then returns an access token", async () => {
     const res = await request(app).post("/api/auth/register").send(registerBody);
 
     expect(res.status).toBe(201);
@@ -66,8 +74,13 @@ describe("POST /api/auth/register", () => {
       email: registerBody.email,
     });
 
-    const verified = await import("../lib/jwt.js").then((m) => m.verifyAuthToken(body.token));
+    const verified = await import("../lib/jwt.js").then((m) => m.verifyAccessToken(body.accessToken));
     expect(verified).toEqual({ sub: "user_1", agencyId: "agency_1" });
+
+    // Refresh token should be created in DB
+    expect(mocks.refreshToken.create).toHaveBeenCalledTimes(1);
+    // Refresh token cookie should be set
+    expect(res.headers["set-cookie"]).toBeDefined();
   });
 
   it("stores a hash, never the password itself", async () => {
@@ -85,7 +98,6 @@ describe("POST /api/auth/register", () => {
 
     expect(res.status).toBe(409);
     expect(res.body).toEqual({ status: "error", message: "Email already registered" });
-    // The old check-then-create pattern raced; the database is now the arbiter.
     expect(mocks.user.findUnique).not.toHaveBeenCalled();
   });
 
@@ -120,13 +132,19 @@ describe("POST /api/auth/login", () => {
     });
   }
 
-  it("returns a token for the right password", async () => {
+  it("returns an access token for the right password", async () => {
     await seedUser(registerBody.password);
 
     const res = await request(app).post("/api/auth/login").send({ email: registerBody.email, password: registerBody.password });
 
     expect(res.status).toBe(200);
     expect((res.body as AuthResponse).user.agencyId).toBe("agency_1");
+    expect((res.body as AuthResponse).accessToken).toBeDefined();
+
+    // Refresh token should be created in DB
+    expect(mocks.refreshToken.create).toHaveBeenCalledTimes(1);
+    // Refresh token cookie should be set
+    expect(res.headers["set-cookie"]).toBeDefined();
   });
 
   it("gives the same answer for a wrong password and an unknown email", async () => {
@@ -153,8 +171,6 @@ describe("POST /api/auth/login", () => {
     const elapsed = performance.now() - started;
 
     expect(res.status).toBe(401);
-    // Prisma is mocked, so a short-circuit would answer in ~1ms. The decoy hash
-    // keeps an unknown email as slow as a wrong password.
     expect(elapsed).toBeGreaterThan(20);
   });
 
@@ -163,6 +179,34 @@ describe("POST /api/auth/login", () => {
 
     expect(res.status).toBe(400);
     expect(mocks.user.findUnique).not.toHaveBeenCalled();
+  });
+});
+
+describe("POST /api/auth/logout", () => {
+  it("revokes all refresh tokens for the user and clears the cookie", async () => {
+    // Mock verifyRefreshToken to return a valid payload
+    const { signRefreshToken } = await import("../lib/jwt.js");
+    const refreshToken = signRefreshToken("user_1", "token_abc");
+
+    const res = await request(app)
+      .post("/api/auth/logout")
+      .set("Cookie", [`refresh_token=${refreshToken}`]);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ status: "ok" });
+    expect(mocks.refreshToken.updateMany).toHaveBeenCalledWith({
+      where: { userId: "user_1", revokedAt: null },
+      data: { revokedAt: expect.any(Date) },
+    });
+  });
+
+  it("clears cookie even with invalid token", async () => {
+    const res = await request(app)
+      .post("/api/auth/logout")
+      .set("Cookie", ["refresh_token=invalid-token"]);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ status: "ok" });
   });
 });
 
@@ -185,7 +229,7 @@ describe("GET /api/auth/me", () => {
 
     const res = await request(app)
       .get("/api/auth/me")
-      .set("Authorization", `Bearer ${signAuthToken("user_1", "agency_1")}`);
+      .set("Authorization", `Bearer ${signAccessToken("user_1", "agency_1")}`);
 
     expect(res.status).toBe(200);
     expect((res.body as MeResponse).user).toEqual({
@@ -201,7 +245,7 @@ describe("GET /api/auth/me", () => {
 
     const res = await request(app)
       .get("/api/auth/me")
-      .set("Authorization", `Bearer ${signAuthToken("deleted_user", "agency_1")}`);
+      .set("Authorization", `Bearer ${signAccessToken("deleted_user", "agency_1")}`);
 
     expect(res.status).toBe(401);
   });
@@ -217,7 +261,7 @@ describe("GET /api/auth/me", () => {
 
     const res = await request(app)
       .get("/api/auth/me")
-      .set("Authorization", `Bearer ${signAuthToken("user_1", "agency_other")}`);
+      .set("Authorization", `Bearer ${signAccessToken("user_1", "agency_other")}`);
 
     expect(res.status).toBe(401);
   });

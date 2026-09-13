@@ -1,15 +1,20 @@
+import crypto from "node:crypto";
+
 import { AuthResponseSchema, LoginSchema, MeResponseSchema, RegisterSchema } from "@repo/types";
 import { Router } from "express";
 import type { NextFunction, Request, Response } from "express";
 
-import { signAuthToken } from "../lib/jwt.js";
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt.js";
 import { logger } from "../lib/logger.js";
 import { comparePassword, exceedsBcryptLimit, getDecoyPasswordHash, hashPassword } from "../lib/password.js";
 import { prisma } from "../lib/prisma.js";
 import { getAuth, requireAuth } from "../middleware/auth.js";
-import { loginLimiter, registerLimiter } from "../middleware/rate-limit.js";
+import { loginLimiter, refreshLimiter, registerLimiter } from "../middleware/rate-limit.js";
 
 const router = Router();
+
+const REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
+const REFRESH_TOKEN_NAME = "refresh_token";
 
 function firstIssueMessage(error: { issues: Array<{ message: string }> }): string {
   return error.issues[0]?.message ?? "Invalid request";
@@ -21,6 +26,31 @@ function isUniqueConstraintError(err: unknown): boolean {
   return typeof err === "object" && err !== null && (err as { code?: unknown }).code === "P2002";
 }
 
+function setRefreshCookie(res: Response, token: string, remember: boolean): void {
+  res.cookie(REFRESH_TOKEN_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/api/auth/refresh",
+    ...(remember ? { maxAge: REFRESH_TOKEN_MAX_AGE * 1000 } : {}),
+  });
+}
+
+async function issueTokens(res: Response, userId: string, agencyId: string, remember: boolean): Promise<string> {
+  const accessToken = signAccessToken(userId, agencyId);
+  const tokenId = crypto.randomUUID();
+  const refreshToken = signRefreshToken(userId, tokenId);
+
+  const expiresAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE * 1000);
+
+  await prisma.refreshToken.create({
+    data: { userId, token: tokenId, expiresAt },
+  });
+
+  setRefreshCookie(res, refreshToken, remember);
+  return accessToken;
+}
+
 router.post("/register", registerLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const parsed = RegisterSchema.safeParse(req.body);
@@ -29,6 +59,7 @@ router.post("/register", registerLimiter, async (req: Request, res: Response, ne
       return;
     }
     const data = parsed.data;
+    const remember = req.body.remember === true;
 
     if (exceedsBcryptLimit(data.password)) {
       res.status(400).json({ status: "error", message: "Password must be 72 characters or fewer" });
@@ -39,12 +70,6 @@ router.post("/register", registerLimiter, async (req: Request, res: Response, ne
 
     let created: { agency: { id: string; name: string }; user: { id: string; email: string } };
     try {
-      // No pre-flight email check: two concurrent requests both pass it and the
-      // loser still hits the unique index. Let the database be the arbiter and
-      // translate its violation into a clean 409.
-      // Generous timeouts: Neon free-tier sleeps after inactivity and a first
-      // wake takes ~12s, well past Prisma's 5s interactive-transaction default.
-      // Without this every register on a cold database 500s.
       created = await prisma.$transaction(
         async (tx) => {
           const agency = await tx.agency.create({
@@ -75,13 +100,12 @@ router.post("/register", registerLimiter, async (req: Request, res: Response, ne
       throw err;
     }
 
-    const token = signAuthToken(created.user.id, created.agency.id);
+    const accessToken = await issueTokens(res, created.user.id, created.agency.id, remember);
     logger.info("auth.register_succeeded", { userId: created.user.id, agencyId: created.agency.id });
-    // Guarantee the wire contract — a bug here must 500, never ship a malformed body.
     res.status(201).json(
       AuthResponseSchema.parse({
         status: "ok",
-        token,
+        accessToken,
         user: {
           id: created.user.id,
           agencyId: created.agency.id,
@@ -103,6 +127,8 @@ router.post("/login", loginLimiter, async (req: Request, res: Response, next: Ne
       return;
     }
 
+    const remember = req.body.remember === true;
+
     const user = await prisma.user.findUnique({
       where: { email: parsed.data.email },
       include: { agency: true },
@@ -120,12 +146,12 @@ router.post("/login", loginLimiter, async (req: Request, res: Response, next: Ne
       return;
     }
 
-    const token = signAuthToken(user.id, user.agencyId);
+    const accessToken = await issueTokens(res, user.id, user.agencyId, remember);
     logger.info("auth.login_succeeded", { userId: user.id, agencyId: user.agencyId });
     res.json(
       AuthResponseSchema.parse({
         status: "ok",
-        token,
+        accessToken,
         user: { id: user.id, agencyId: user.agencyId, agencyName: user.agency.name, email: user.email },
       }),
     );
@@ -134,9 +160,86 @@ router.post("/login", loginLimiter, async (req: Request, res: Response, next: Ne
   }
 });
 
+router.post("/refresh", refreshLimiter, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const token = req.cookies?.[REFRESH_TOKEN_NAME];
+    if (!token) {
+      res.status(401).json({ status: "error", message: "Refresh token required" });
+      return;
+    }
+
+    let payload;
+    try {
+      payload = verifyRefreshToken(token);
+    } catch {
+      res.status(401).json({ status: "error", message: "Invalid refresh token" });
+      return;
+    }
+
+    const stored = await prisma.refreshToken.findUnique({ where: { token: payload.tokenId } });
+    if (!stored || stored.revokedAt || stored.expiresAt < new Date()) {
+      res.status(401).json({ status: "error", message: "Refresh token revoked or expired" });
+      return;
+    }
+
+    // Rotate: revoke old token, issue new pair
+    await prisma.refreshToken.update({
+      where: { token: payload.tokenId },
+      data: { revokedAt: new Date() },
+    });
+
+    const user = await prisma.user.findUnique({ where: { id: payload.sub }, include: { agency: true } });
+    if (!user) {
+      res.status(401).json({ status: "error", message: "User not found" });
+      return;
+    }
+
+    const newAccessToken = signAccessToken(user.id, user.agencyId);
+    const newTokenId = crypto.randomUUID();
+    const newRefreshToken = signRefreshToken(user.id, newTokenId);
+    const expiresAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE * 1000);
+
+    await prisma.refreshToken.create({
+      data: { userId: user.id, token: newTokenId, expiresAt },
+    });
+
+    // Detect if original cookie had maxAge (remember=true)
+    const originalMaxAge = req.cookies?.[`${REFRESH_TOKEN_NAME}.maxAge`];
+    const remember = originalMaxAge !== undefined;
+    setRefreshCookie(res, newRefreshToken, remember);
+
+    logger.info("auth.refresh_succeeded", { userId: user.id });
+    res.json({ status: "ok", accessToken: newAccessToken });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/logout", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const token = req.cookies?.[REFRESH_TOKEN_NAME];
+    if (token) {
+      try {
+        const payload = verifyRefreshToken(token);
+        await prisma.refreshToken.updateMany({
+          where: { userId: payload.sub, revokedAt: null },
+          data: { revokedAt: new Date() },
+        });
+      } catch {
+        // Token invalid/expired — still clear the cookie
+      }
+    }
+
+    res.clearCookie(REFRESH_TOKEN_NAME, { path: "/api/auth/refresh" });
+    res.json({ status: "ok" });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // The frontend's session check after a reload. Re-reads the user instead of
 // trusting the token alone, so a deleted account cannot keep browsing the portal
-// until its 7-day token expires.
+// until its token expires.
 router.get("/me", requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId, agencyId } = getAuth(req);

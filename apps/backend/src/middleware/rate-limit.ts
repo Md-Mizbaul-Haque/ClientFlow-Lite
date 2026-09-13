@@ -20,3 +20,12 @@ export const registerLimiter = rateLimit({
   legacyHeaders: false,
   message: { status: "error", message: "Too many accounts created. Please try again later." },
 });
+
+// Refresh token brute-force guard: 30 requests per 15 minutes per IP.
+export const refreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { status: "error", message: "Too many refresh attempts. Please try again later." },
+});

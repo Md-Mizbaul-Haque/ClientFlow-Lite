@@ -84,11 +84,26 @@ export type AuthUser = z.infer<typeof AuthUserSchema>;
 
 export const AuthResponseSchema = z.object({
   status: z.literal("ok"),
-  token: z.string(),
+  accessToken: z.string(),
   user: AuthUserSchema,
 });
 
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+
+// Returned by POST /api/auth/refresh
+export const RefreshResponseSchema = z.object({
+  status: z.literal("ok"),
+  accessToken: z.string(),
+});
+
+export type RefreshResponse = z.infer<typeof RefreshResponseSchema>;
+
+// Returned by POST /api/auth/logout
+export const LogoutResponseSchema = z.object({
+  status: z.literal("ok"),
+});
+
+export type LogoutResponse = z.infer<typeof LogoutResponseSchema>;
 
 // Returned by GET /api/auth/me — the client's source of truth for "am I still
 // signed in, and who am I?" after a page reload.
@@ -98,3 +113,43 @@ export const MeResponseSchema = z.object({
 });
 
 export type MeResponse = z.infer<typeof MeResponseSchema>;
+
+// Search — POST /api/search
+export const SearchResultSchema = z.object({
+  type: z.enum(["request", "client", "invoice"]),
+  id: z.string(),
+  title: z.string(),
+  subtitle: z.string(),
+  url: z.string(),
+});
+
+export type SearchResult = z.infer<typeof SearchResultSchema>;
+
+export const SearchResponseSchema = z.object({
+  results: z.array(SearchResultSchema),
+});
+
+type SearchResponse = z.infer<typeof SearchResponseSchema>;
+
+// Notifications — GET /api/notifications, PATCH /api/notifications/read
+export const NotificationSchema = z.object({
+  id: z.string(),
+  type: z.enum(["info", "warning", "success", "error"]),
+  title: z.string(),
+  body: z.string(),
+  link: z.string().optional(),
+  read: z.boolean(),
+  createdAt: z.string(),
+});
+
+export type Notification = z.infer<typeof NotificationSchema>;
+
+export const NotificationsListSchema = z.object({
+  notifications: z.array(NotificationSchema),
+  unreadCount: z.number(),
+  nextCursor: z.string().nullable(),
+});
+
+export type NotificationsList = z.infer<typeof NotificationsListSchema>;
+
+

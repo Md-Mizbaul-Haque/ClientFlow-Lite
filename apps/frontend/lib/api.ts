@@ -1,7 +1,7 @@
 import { MeResponseSchema } from "@repo/types";
 import type { AuthResponse, AuthUser, LoginInput, RegisterInput } from "@repo/types";
 
-import { clearSession, getToken } from "./session";
+import { clearSession, getToken, saveSession } from "./session";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 
@@ -18,13 +18,58 @@ export class ApiError extends Error {
 
 const CONNECT_ERROR = "We could not connect. Please check your internet connection and try again.";
 
-async function request(path: string, init: RequestInit): Promise<Response> {
+// Mutex to prevent multiple simultaneous refresh attempts
+let refreshPromise: Promise<string> | null = null;
+
+async function refreshAccessToken(): Promise<string> {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    try {
+      const res = await fetch(`${BASE}/api/auth/refresh`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = (await res.json().catch(() => null)) as { status?: string; accessToken?: string } | null;
+      if (!res.ok || !data || data.status !== "ok" || !data.accessToken) {
+        throw new Error("Refresh failed");
+      }
+      // Save the new access token
+      const currentToken = getToken();
+      if (currentToken) {
+        // Preserve the remember setting by checking which store has the token
+        saveSession(data.accessToken, true);
+      }
+      return data.accessToken;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
+
+async function request(path: string, init: RequestInit, retryOn401 = true): Promise<Response> {
   const headers = new Headers(init.headers);
   headers.set("Accept", "application/json");
   const token = getToken();
   if (token) headers.set("Authorization", `Bearer ${token}`);
   try {
-    return await fetch(`${BASE}${path}`, { ...init, headers });
+    const res = await fetch(`${BASE}${path}`, { ...init, headers, credentials: "include" });
+
+    // Auto-refresh on 401 (but not for login/register/refresh endpoints)
+    if (res.status === 401 && retryOn401 && !path.startsWith("/api/auth/")) {
+      try {
+        const newToken = await refreshAccessToken();
+        headers.set("Authorization", `Bearer ${newToken}`);
+        return await fetch(`${BASE}${path}`, { ...init, headers, credentials: "include" });
+      } catch {
+        // Refresh failed — fall through to clear session
+      }
+    }
+
+    return res;
   } catch {
     // Browser never reached the backend: server down, wrong URL, or no internet.
     throw new ApiError(CONNECT_ERROR, 0);
@@ -33,15 +78,19 @@ async function request(path: string, init: RequestInit): Promise<Response> {
 
 async function postAuth(
   path: "/api/auth/register" | "/api/auth/login",
-  body: RegisterInput | LoginInput,
+  body: RegisterInput | LoginInput & { remember: boolean },
 ): Promise<AuthResponse> {
-  const res = await request(path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const res = await request(
+    path,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+    false,
+  );
   const data = (await res.json().catch(() => null)) as Partial<AuthResponse & { message: string }> | null;
-  if (!res.ok || !data || data.status !== "ok" || !data.token) {
+  if (!res.ok || !data || data.status !== "ok" || !data.accessToken) {
     throw new ApiError(toFriendlyError(res.status, data?.message), res.status);
   }
   return data as AuthResponse;
@@ -61,11 +110,11 @@ function toFriendlyError(status: number, serverMessage?: string): string {
 }
 
 export function register(input: RegisterInput): Promise<AuthResponse> {
-  return postAuth("/api/auth/register", input);
+  return postAuth("/api/auth/register", { ...input, remember: true } as RegisterInput & { remember: boolean });
 }
 
-export function login(input: LoginInput): Promise<AuthResponse> {
-  return postAuth("/api/auth/login", input);
+export function login(input: LoginInput, remember: boolean): Promise<AuthResponse> {
+  return postAuth("/api/auth/login", { ...input, remember });
 }
 
 export class SessionExpiredError extends ApiError {
@@ -96,7 +145,15 @@ export async function getMe(): Promise<AuthUser> {
   return parsed.data.user;
 }
 
-export function logout(): void {
+export async function logout(): Promise<void> {
+  try {
+    await fetch(`${BASE}/api/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch {
+    // Logout request failed — still clear local session
+  }
   clearSession();
 }
 
@@ -110,4 +167,56 @@ export async function authFetch(path: string, init: RequestInit = {}): Promise<R
     throw new SessionExpiredError();
   }
   return res;
+}
+
+// Search
+export interface SearchResult {
+  type: "request" | "client" | "invoice";
+  id: string;
+  title: string;
+  subtitle: string;
+  url: string;
+}
+
+export async function search(query: string, limit = 10): Promise<SearchResult[]> {
+  const res = await authFetch("/api/search", {
+    method: "POST",
+    body: JSON.stringify({ query, limit }),
+  });
+  if (!res.ok) throw new ApiError("Search failed. Please try again.", res.status);
+  const data = (await res.json().catch(() => null)) as { results?: SearchResult[] } | null;
+  return data?.results ?? [];
+}
+
+// Notifications
+export interface Notification {
+  id: string;
+  type: "info" | "warning" | "success" | "error";
+  title: string;
+  body: string;
+  link?: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export async function getNotifications(cursor?: string): Promise<{ notifications: Notification[]; unreadCount: number; nextCursor: string | null }> {
+  const params = new URLSearchParams();
+  if (cursor) params.set("cursor", cursor);
+  params.set("limit", "20");
+  const res = await authFetch(`/api/notifications?${params}`);
+  if (!res.ok) throw new ApiError("Failed to load notifications. Please try again.", res.status);
+  const data = (await res.json().catch(() => null)) as { notifications?: Notification[]; unreadCount?: number; nextCursor?: string | null } | null;
+  return {
+    notifications: data?.notifications ?? [],
+    unreadCount: data?.unreadCount ?? 0,
+    nextCursor: data?.nextCursor ?? null,
+  };
+}
+
+export async function markNotificationsRead(id?: string): Promise<void> {
+  const res = await authFetch("/api/notifications/read", {
+    method: "PATCH",
+    body: JSON.stringify({ id }),
+  });
+  if (!res.ok) throw new ApiError("Failed to mark notifications. Please try again.", res.status);
 }

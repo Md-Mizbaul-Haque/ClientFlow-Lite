@@ -21,6 +21,9 @@ model Agency {
   teamSize      String
   createdAt     DateTime @default(now())
   users         User[]
+  requests      Request[]
+  clients       Client[]
+  invoices      Invoice[]
 }
 
 model User {
@@ -30,4 +33,88 @@ model User {
   email        String   @unique
   passwordHash String
   createdAt    DateTime @default(now())
+  notifications Notification[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   @default("info") // info | warning | success | error
+  title     String
+  body      String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}
+
+model Client {
+  id         String   @id @default(cuid())
+  agencyId   String
+  agency     Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  name       String
+  company    String?
+  email      String   @unique
+  createdAt  DateTime @default(now())
+  requests   Request[]
+  invoices   Invoice[]
+
+  @@index([agencyId, name])
+  @@index([agencyId, email])
+}
+
+model Request {
+  id         String   @id @default(cuid())
+  agencyId   String
+  agency     Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title      String
+  description String?
+  status     String   @default("new") // new | in_progress | feedback | delivered
+  priority   String   @default("medium") // low | medium | high
+  dueDate    DateTime?
+  formData   Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([agencyId, title])
+  @@index([agencyId, status])
+}
+
+model Invoice {
+  id         String   @id @default(cuid())
+  agencyId   String
+  agency     Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  number     String   @unique
+  amount     Int      // Stored in cents to avoid floating-point errors
+  currency   String   @default("krw")
+  status     String   @default("draft") // draft | sent | paid | overdue
+  issueDate  DateTime @default(now())
+  dueDate    DateTime?
+  pdfUrl     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([agencyId, number])
+  @@index([agencyId, status])
 }

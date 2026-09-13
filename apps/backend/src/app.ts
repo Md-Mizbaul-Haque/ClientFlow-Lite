@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
@@ -7,6 +8,8 @@ import { env } from "./lib/env.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.js";
 import authRouter from "./routes/auth.js";
 import healthRouter from "./routes/health.js";
+import searchRouter from "./routes/search.js";
+import notificationsRouter from "./routes/notifications.js";
 
 export function createApp(): express.Express {
   const app = express();
@@ -21,6 +24,7 @@ export function createApp(): express.Express {
   // a surprise the day a payload legitimately grows.
   app.use(express.json({ limit: "100kb" }));
   app.use(express.urlencoded({ extended: true, limit: "100kb" }));
+  app.use(cookieParser());
   // "combined" keeps method, status, referrer, and user agent in production logs.
   app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));
 
@@ -28,8 +32,10 @@ export function createApp(): express.Express {
     res.json({ name: "@repo/backend", status: "ok", docs: "/api/health" });
   });
 
-  app.use("/api/health", healthRouter);
-  app.use("/api/auth", authRouter);
+app.use("/api/health", healthRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/search", searchRouter);
+app.use("/api/notifications", notificationsRouter);
 
   // 404 + error handler must be last
   app.use(notFoundHandler);
