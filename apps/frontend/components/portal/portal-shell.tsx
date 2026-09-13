@@ -64,7 +64,7 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
 
       {/* Content — Figma: offset 280px from sidebar, max-width 1096px, padding 32px */}
       <div className="lg:pl-[280px]">
-        <Topbar onMenu={() => setOpen(true)} onSearchToggle={() => setSearchOpen((v) => !v)} searchOpen={searchOpen} />
+        <Topbar onMenu={() => setOpen(true)} onSearchOpenChange={setSearchOpen} searchOpen={searchOpen} />
         <main className="mx-auto w-full max-w-[1096px] px-8 py-8">{children}</main>
       </div>
     </div>
