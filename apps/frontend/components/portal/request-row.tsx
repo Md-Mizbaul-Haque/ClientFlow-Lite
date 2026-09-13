@@ -6,7 +6,7 @@ import type { PortalRequest } from "@/lib/portal-mock";
 
 export function RequestRow({ request }: { request: PortalRequest }) {
   return (
-    <article className="flex flex-col gap-3 rounded-xl border border-border bg-white p-4 transition-colors hover:border-border-strong sm:flex-row sm:items-center sm:gap-4">
+    <article className="flex flex-col gap-3 rounded-lg border border-neutral-100 bg-white p-4 transition-colors hover:border-neutral-300 sm:flex-row sm:items-center sm:gap-4">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="text-sm font-semibold text-neutral-900">{request.title}</h3>

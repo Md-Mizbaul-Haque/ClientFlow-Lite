@@ -18,7 +18,7 @@ export default function RequestsPage() {
   const visible = filter === "All" ? requests : requests.filter((r) => r.status === filter);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-bold text-neutral-900">Request queue</h2>
         <p className="text-sm text-neutral-500">Every client brief in one place — newest first.</p>
@@ -37,18 +37,18 @@ export default function RequestsPage() {
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                 active
                   ? "border-primary bg-primary text-white"
-                  : "border-border bg-white text-neutral-600 hover:border-border-strong hover:text-neutral-900"
+                  : "border-border bg-white text-neutral-600 hover:border-neutral-400 hover:text-neutral-900"
               }`}
             >
               {s}
-              <span className={`rounded-full px-1.5 text-[11px] ${active ? "bg-white/20" : "bg-neutral-100"}`}>{count}</span>
+              <span className={`rounded-full px-1.5 text-xs ${active ? "bg-white/20" : "bg-neutral-100"}`}>{count}</span>
             </button>
           );
         })}
       </div>
 
       {visible.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-white px-6 py-16 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-neutral-300 bg-white px-6 py-16 text-center">
           <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-soft text-primary">
             <Inbox size={22} aria-hidden="true" />
           </span>

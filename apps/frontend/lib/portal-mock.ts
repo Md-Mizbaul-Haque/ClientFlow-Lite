@@ -49,8 +49,23 @@ export type ActivityItem = {
 };
 
 export const activity: ActivityItem[] = [
-  { id: "a1", text: "Bright Dental commented on “Pricing section copy + layout”", time: "25 min ago" },
-  { id: "a2", text: "You moved “Logo variations round 2” to In Progress", time: "2 hrs ago" },
-  { id: "a3", text: "Acme Co approved “Investor deck touch-up”", time: "Yesterday" },
-  { id: "a4", text: "New request “Homepage speed audit” from TeamTown", time: "Yesterday" },
+  { id: "a1", text: "Bright Dental commented on 'Pricing section copy + layout'", time: "25 min ago" },
+  { id: "a2", text: "You moved 'Logo variations round 2' to In Progress", time: "2 hrs ago" },
+  { id: "a3", text: "Acme Co approved 'Investor deck touch-up'", time: "Yesterday" },
+  { id: "a4", text: "New request 'Homepage speed audit' from TeamTown", time: "Yesterday" },
+];
+
+export type Notification = {
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+  read: boolean;
+};
+
+export const notifications: Notification[] = [
+  { id: "n1", title: "New request submitted", description: "TeamTown submitted 'Homepage speed audit'", time: "10 min ago", read: false },
+  { id: "n2", title: "Feedback received", description: "Bright Dental commented on 'Pricing section copy + layout'", time: "25 min ago", read: false },
+  { id: "n3", title: "Request delivered", description: "You marked 'Investor deck touch-up' as delivered", time: "Yesterday", read: true },
+  { id: "n4", title: "Client approved", description: "Acme Co approved 'Investor deck touch-up'", time: "Yesterday", read: true },
 ];

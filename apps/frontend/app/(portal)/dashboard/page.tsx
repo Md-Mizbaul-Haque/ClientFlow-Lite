@@ -10,9 +10,10 @@ export default function DashboardPage() {
         <p className="text-sm text-neutral-500">Here is what needs your attention today.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {/* Stats grid — Figma: 24px gap */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((s) => (
-          <div key={s.label} className="flex flex-col gap-1 rounded-xl border border-border bg-white p-4">
+          <div key={s.label} className="flex flex-col gap-1 rounded-lg border border-neutral-100 bg-white p-4">
             <p className="text-xs font-medium text-neutral-500">{s.label}</p>
             <p className="text-2xl font-bold text-neutral-900">{s.value}</p>
             <p className="text-xs text-neutral-500">{s.hint}</p>
@@ -20,8 +21,9 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-        <section aria-label="Needs attention" className="flex flex-col gap-3 rounded-xl border border-border bg-white p-4">
+      {/* 2-col sections — Figma: 24px gap */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <section aria-label="Needs attention" className="flex flex-col gap-3 rounded-lg border border-neutral-100 bg-white p-4">
           <h3 className="text-sm font-semibold text-neutral-900">Needs attention</h3>
           {awaiting.length === 0 ? (
             <p className="text-sm text-neutral-500">Nothing waiting on feedback. Queue is clear.</p>
@@ -44,7 +46,7 @@ export default function DashboardPage() {
           )}
         </section>
 
-        <section aria-label="Recent activity" className="flex flex-col gap-3 rounded-xl border border-border bg-white p-4">
+        <section aria-label="Recent activity" className="flex flex-col gap-3 rounded-lg border border-neutral-100 bg-white p-4">
           <h3 className="text-sm font-semibold text-neutral-900">Recent activity</h3>
           <ul className="flex flex-col divide-y divide-border">
             {activity.map((a) => (

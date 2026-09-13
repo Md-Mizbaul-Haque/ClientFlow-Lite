@@ -59,18 +59,18 @@ export default function OnboardingPage() {
         </div>
 
         {/* Card */}
-        <div className="rounded-xl border border-border bg-white p-6 sm:p-8 shadow-sm">
+        <div className="rounded-lg border border-neutral-100 bg-white p-6 sm:p-8">
           {current === 1 && (
             <div className="flex flex-col gap-6">
               <h2 className="text-lg font-semibold text-neutral-900">Workspace details</h2>
               <Input label="Agency Name" requiredMark placeholder="e.g. DesignGuru Studio" />
-              <div className="flex flex-col gap-[6px]">
-                <div className="flex items-center gap-1">
-                  <label className="text-sm font-medium text-neutral-700">Subdomain</label>
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center gap-0.5">
+                  <label className="text-sm font-medium text-neutral-900">Subdomain</label>
                   <span className="text-error text-sm">*</span>
                 </div>
-                <div className="flex items-center gap-2 rounded-lg border border-border bg-bg-input px-4 h-[56px] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
-                  <input placeholder="your-agency" className="flex-1 bg-transparent text-sm placeholder:text-neutral-400 focus:outline-none" />
+                <div className="flex items-center gap-2.5 rounded-md border border-border bg-white px-5 h-11 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+                  <input placeholder="your-agency" className="flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none" />
                   <span className="text-sm text-neutral-500 whitespace-nowrap">.myclone.com</span>
                 </div>
                 <p className="text-xs text-neutral-500">You can add a custom domain later (CNAME).</p>
@@ -86,8 +86,8 @@ export default function OnboardingPage() {
             <div className="flex flex-col gap-6">
               <h2 className="text-lg font-semibold text-neutral-900">Branding</h2>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-neutral-700">Logo</label>
-                <div className="flex items-center gap-4 rounded-lg border border-dashed border-border bg-neutral-50 p-4">
+                <label className="text-sm font-medium text-neutral-900">Logo</label>
+                <div className="flex items-center gap-4 rounded-md border border-dashed border-neutral-300 bg-neutral-50 p-4">
                   <div className="h-12 w-12 rounded bg-white border border-border flex items-center justify-center text-xs text-neutral-400">Logo</div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">Upload logo</p>
@@ -97,7 +97,7 @@ export default function OnboardingPage() {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-neutral-700">Brand Color</label>
+                <label className="text-sm font-medium text-neutral-900">Brand Color</label>
                 <div className="flex items-center gap-3">
                   <input
                     type="color"
@@ -124,8 +124,8 @@ export default function OnboardingPage() {
               <h2 className="text-lg font-semibold text-neutral-900">Create your first service</h2>
               <Input label="Service Name" requiredMark placeholder='e.g. "Logo Design"' />
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-neutral-700">Pricing Model</label>
-                <select className="h-[56px] rounded-lg border border-border bg-bg-input px-4 text-sm focus:border-primary focus:outline-none">
+                <label className="text-sm font-medium text-neutral-900">Pricing Model</label>
+                <select className="h-11 rounded-md border border-border bg-white px-5 text-sm text-neutral-900 focus:border-primary focus:outline-none">
                   <option>One-time — $500 per request</option>
                   <option>Hourly pack — 10h @ $500</option>
                   <option>Recurring — $99/mo</option>

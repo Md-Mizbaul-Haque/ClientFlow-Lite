@@ -25,11 +25,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="antialiased">
         <NextTopLoader
-          color="#005EB8"
+          color="#6BA2D6"
           height={3}
           showSpinner={false}
           showForHashAnchor={false}
-          shadow="0 0 10px #005EB8,0 0 5px #005EB8"
+          shadow="0 0 10px #6BA2D6,0 0 5px #6BA2D6"
         />
         {children}
       </body>
