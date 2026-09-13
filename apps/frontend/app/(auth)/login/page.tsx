@@ -41,8 +41,8 @@ export default function LoginPage() {
     setSending(true);
     setFormError(null);
     try {
-      const res = await login(parsed.data);
-      saveSession(res.token, remember);
+      const res = await login(parsed.data, remember);
+      saveSession(res.accessToken, remember);
       // replace, not push: the login form must not be one back-button press away
       // from an authenticated portal.
       router.replace("/dashboard");
@@ -64,24 +64,24 @@ export default function LoginPage() {
       {/* Form */}
       <form className="flex flex-col gap-4" onSubmit={handleLogin}>
         {formError ? (
-          <p role="alert" className="rounded-lg border border-error bg-[#FDECEC] px-4 py-3 text-sm text-error">
+          <p role="alert" className="rounded-md border border-error bg-[#FDECEC] px-4 py-3 text-sm text-error">
             {formError}
           </p>
         ) : null}
         <Input label="Email" requiredMark placeholder="Input your registered email" type="email" value={email} error={errors.email} onChange={(e) => { setEmail(e.target.value); clearError("email"); }} />
-        <div className="flex flex-col gap-[6px]">
-          <div className="flex items-center gap-1">
-            <label className="text-sm font-medium text-neutral-700">Password</label>
+        <div className="flex flex-col gap-2.5">
+          <div className="flex items-center gap-0.5">
+            <label className="text-sm font-medium text-neutral-900">Password</label>
             <span className="text-error text-sm">*</span>
           </div>
-          <div className={`flex items-center gap-2 rounded-lg border bg-white px-4 h-[56px] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${errors.password ? "border-error" : "border-border"}`}>
+          <div className={`flex items-center gap-2.5 rounded-md border bg-white px-5 h-11 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${errors.password ? "border-error" : "border-border"}`}>
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Input your password"
               value={password}
               aria-invalid={errors.password !== undefined}
               onChange={(e) => { setPassword(e.target.value); clearError("password"); }}
-              className="flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none autofill:bg-white"
+              className="flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none autofill:bg-white"
             />
             <button
               type="button"

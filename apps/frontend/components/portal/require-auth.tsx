@@ -64,7 +64,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
             aria-hidden="true"
             className="h-8 w-8 animate-spin rounded-full border-2 border-primary-soft border-t-primary"
           />
-          <span className="text-sm text-neutral-500">Checking your session…</span>
+          <span className="text-sm text-neutral-500">Wait a second</span>
         </span>
       </div>
     );

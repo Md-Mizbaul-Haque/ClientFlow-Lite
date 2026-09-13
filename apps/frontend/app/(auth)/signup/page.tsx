@@ -95,7 +95,7 @@ export default function SignupPage() {
       const res = await register(parsed.data);
       // Keep a new account signed in across browser restarts — it has no
       // "remember me" control to ask with.
-      saveSession(res.token, true);
+      saveSession(res.accessToken, true);
       router.replace("/dashboard");
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Registration failed");
@@ -119,19 +119,19 @@ export default function SignupPage() {
         <form className="flex flex-col gap-4" onSubmit={handleStep1}>
           <Input label="Agency Name" requiredMark placeholder="e.g. DesignGuru Studio" value={agencyName} error={errors.agencyName} onChange={(e) => { setAgencyName(e.target.value); clearError("agencyName"); }} />
           <Input label="Work Email" requiredMark placeholder="you@agency.com" type="email" value={email} error={errors.email} onChange={(e) => { setEmail(e.target.value); clearError("email"); }} />
-          <div className="flex flex-col gap-[6px]">
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium text-neutral-700">Password</label>
+          <div className="flex flex-col gap-2.5">
+            <div className="flex items-center gap-0.5">
+              <label className="text-sm font-medium text-neutral-900">Password</label>
               <span className="text-error text-sm">*</span>
             </div>
-            <div className={`flex items-center gap-2 rounded-lg border bg-bg-input px-4 h-[56px] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${errors.password ? "border-error" : "border-border"}`}>
+            <div className={`flex items-center gap-2.5 rounded-md border bg-white px-5 h-11 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${errors.password ? "border-error" : "border-border"}`}>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Create a strong password"
                 value={password}
                 aria-invalid={errors.password !== undefined}
                 onChange={(e) => { setPassword(e.target.value); clearError("password"); }}
-                className="flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
+                className="flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none"
               />
               <button
                 type="button"
@@ -172,16 +172,16 @@ export default function SignupPage() {
       ) : (
         <form className="flex flex-col gap-4" onSubmit={handleContinue}>
           {formError ? (
-            <p role="alert" className="rounded-lg border border-error bg-[#FDECEC] px-4 py-3 text-sm text-error">
+            <p role="alert" className="rounded-md border border-error bg-[#FDECEC] px-4 py-3 text-sm text-error">
               {formError}
             </p>
           ) : null}
-          <div className="flex flex-col gap-[6px]">
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium text-neutral-700">Agency Website</label>
+          <div className="flex flex-col gap-2.5">
+            <div className="flex items-center gap-0.5">
+              <label className="text-sm font-medium text-neutral-900">Agency Website</label>
             </div>
-            <div className={`flex items-center gap-0 rounded-lg border bg-white pl-4 h-[56px] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden ${errors.website ? "border-error" : "border-border"}`}>
-              <span className="shrink-0 text-sm text-neutral-400">https://</span>
+            <div className={`flex items-center gap-0 rounded-md border bg-white pl-5 h-11 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden ${errors.website ? "border-error" : "border-border"}`}>
+              <span className="shrink-0 text-sm text-neutral-500">https://</span>
               <input
                 type="text"
                 inputMode="url"
@@ -196,16 +196,16 @@ export default function SignupPage() {
             {errors.website ? <p className="text-xs text-error">{errors.website}</p> : null}
           </div>
 
-          <div className="flex flex-col gap-[6px]">
-            <div className="flex items-center gap-1">
-              <label className="text-sm font-medium text-neutral-700">What types of services do you offer?!</label>
+          <div className="flex flex-col gap-2.5">
+            <div className="flex items-center gap-0.5">
+              <label className="text-sm font-medium text-neutral-900">What types of services do you offer?!</label>
               <span className="text-error text-sm">*</span>
             </div>
             <select
               value={service}
               aria-invalid={errors.serviceType !== undefined}
               onChange={(e) => { setService(e.target.value); clearError("serviceType"); }}
-              className={`h-[56px] rounded-lg border bg-bg-input px-4 text-sm text-neutral-900 focus:border-primary focus:outline-none ${errors.serviceType ? "border-error" : "border-border"}`}
+              className={`h-11 rounded-md border bg-white px-5 text-sm text-neutral-900 focus:border-primary focus:outline-none ${errors.serviceType ? "border-error" : "border-border"}`}
             >
               <option value="">Select your agency type</option>
               {SERVICE_OPTIONS.map((o) => (
@@ -222,7 +222,7 @@ export default function SignupPage() {
           ) : null}
 
           <fieldset className="flex flex-col gap-4">
-            <legend className="text-sm font-medium text-neutral-700">How many team members work in your agency?</legend>
+            <legend className="text-sm font-medium text-neutral-900">How many team members work in your agency?</legend>
             {errors.teamSize ? <p className="text-xs text-error">{errors.teamSize}</p> : null}
             <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Team size">
               {TEAM_SIZES.map((o) => {
@@ -238,17 +238,17 @@ export default function SignupPage() {
                       className="sr-only"
                     />
                     <span
-                      className={`flex h-[48px] items-center gap-3 rounded-lg border bg-white px-4 transition-colors ${
+                      className={`flex h-12 items-center gap-3 rounded-md border bg-white px-4 transition-colors ${
                         selected ? "border-primary bg-primary-soft/40" : "border-border"
                       }`}
                     >
                       <span
                         aria-hidden="true"
                         className={`h-4 w-4 shrink-0 rounded-full border transition-colors ${
-                          selected ? "border-[5px] border-primary" : "border-border-strong"
+                          selected ? "border-[5px] border-primary" : "border-neutral-400"
                         }`}
                       />
-                      <span className="text-sm font-medium text-neutral-700">{o}</span>
+                      <span className="text-sm font-medium text-neutral-900">{o}</span>
                     </span>
                   </label>
                 );
