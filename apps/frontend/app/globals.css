@@ -1,5 +1,4 @@
 /* Figma: Client Portal (Community) — Primary font Manrope (400/500/600/700), fallback Inter */
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -7,20 +6,23 @@
   --background: #ffffff;
   --foreground: #111827;
   /* Primary — Figma Primary/B300 */
-  --color-primary: #005EB8;
-  --color-primary-hover: #004A94;
-  --color-primary-light: #6BA2D6;
-  --color-primary-soft: #E6EFF8;
+  --color-primary: #005eb8;
+  --color-primary-hover: #004a94;
+  --color-primary-light: #6ba2d6;
+  --color-primary-soft: #e6eff8;
   /* Neutrals — mapped to Figma Greyscale */
-  --color-page-bg: #FAFAFA;
-  --color-border: #E9EAEC;
-  --color-border-card: #F8F8F8;
-  --color-border-strong: #CBD5E0;
+  --color-page-bg: #fafafa;
+  --color-border: #e9eaec;
+  --color-border-card: #f8f8f8;
+  --color-border-strong: #cbd5e0;
   --color-text-primary: #111827;
   --color-text-secondary: #687588;
-  --color-text-tertiary: #66768E;
-  --color-placeholder: #A0AEC0;
-  --color-error: #E03137;
+  --color-text-tertiary: #66768e;
+  --color-placeholder: #a0aec0;
+  --color-error: #e03137;
+  /* Derived tokens referenced by components but absent from the Figma palette */
+  --color-primary-deep: #003e7e;
+  --color-success-deep: #046c4e;
 }
 
 @theme inline {
@@ -28,16 +30,57 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--color-primary);
   --color-border: var(--color-border);
-  --font-sans: "Manrope", "Inter", system-ui, sans-serif;
+  --color-primary-hover: var(--color-primary-hover);
+  --color-primary-light: var(--color-primary-light);
+  --color-primary-soft: var(--color-primary-soft);
+  --color-primary-deep: var(--color-primary-deep);
+  --color-page-bg: var(--color-page-bg);
+  --color-border-card: var(--color-border-card);
+  --color-border-strong: var(--color-border-strong);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-placeholder: var(--color-placeholder);
+  --color-error: var(--color-error);
+  --color-success-deep: var(--color-success-deep);
+  /* Shape tokens — one radius scale and one shadow scale for the whole site.
+     Components must use these instead of choosing rounded-lg/xl/2xl and
+     shadow-sm/lg/xl ad hoc: mixed radii and mixed elevation are the fastest
+     way a page reads as a template rather than a custom build.
+
+       rounded-control  buttons, inputs, small chips
+       rounded-card     cards, tiles, panels
+       rounded-shell    browser frame and large feature surfaces */
+  --radius-control: 0.5rem;
+  --radius-card: 1rem;
+  --radius-shell: 1.25rem;
+  /*    shadow-card   resting card
+        shadow-lift   hover / raised
+        shadow-shell  the hero product frame: layered tint (contact + mid +
+                      ambient) plus the blurred floor glow in
+                      hero-portal-mockup.tsx — the only shadow in the hero */
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.06);
+  --shadow-lift: 0 14px 30px -14px rgb(16 24 40 / 0.22);
+  --shadow-shell:
+    0 1px 2px rgb(0 62 126 / 0.14),
+    0 16px 40px -16px rgb(0 62 126 / 0.28),
+    0 48px 88px -32px rgb(0 62 126 / 0.32);
+  /* next/font hashes the family names, so this must reference the generated
+     CSS variables rather than the literal "Manrope"/"Inter" strings. */
+  --font-sans: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
 }
 
-* {
-  font-family: var(--font-sans);
+html {
+  /* Anchor jumps must clear the 64px sticky navbar. One rule covers every
+     section on every page, present and future — no per-section scroll-mt. */
+  scroll-padding-top: 5rem;
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -62,4 +105,127 @@ input:autofill {
 }
 .container-split {
   max-width: 1440px;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Longhand declarations on purpose: the animation shorthand would reset
+   animation-delay and break the [animation-delay:...] stagger utilities.
+   Never applied to the hero <h1> — that is the LCP element (see app/page.tsx). */
+.animate-fade-up {
+  animation-name: fade-up;
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+/* PARKED, not dead: the trusted-by logo strip was removed from the homepage
+   because its wordmarks were invented (fake social proof reads as fake). These
+   rules stay paired with components/site/logo-marquee.tsx so the strip can come
+   back intact once there are real customer logos to show. */
+.animate-marquee {
+  animation: marquee 36s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Scroll reveals. `.js` is added pre-paint by the root layout, so SSR and
+   no-JS render fully visible content. IntersectionObserver adds
+   `.is-visible` once per element; the GPU animates opacity/transform.
+   JS owns stagger delays and clears them after each reveal so they never
+   slow hover transitions on the same element. */
+.js .reveal-item {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.js .reveal-item.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hero backdrop — structural, not decorative: one directional wash from the
+   top-left plus a single radial glow positioned behind the product dashboard in
+   the right column of the split hero.
+
+   Radial gradients paint directly, so this replaces two blur-3xl layers, which
+   were the most expensive thing in the hero to rasterise. No dot grid, no
+   parallax orbs, no client-side JS. */
+.hero-canvas {
+  background-color: #ffffff;
+  background-image:
+    radial-gradient(ellipse 52% 46% at 74% 44%, rgb(107 162 214 / 0.34), transparent 68%),
+    radial-gradient(ellipse 60% 50% at 4% 2%, rgb(0 94 184 / 0.1), transparent 62%),
+    linear-gradient(to bottom, #f6f9fc 0%, #ffffff 62%);
+}
+
+/* Film grain at ~3.5%. Its job is dithering: large soft gradients band on
+   8-bit displays without it. Self-contained SVG turbulence, no image file. */
+.hero-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.035;
+}
+
+/* Dot grid for the hero edges. Radial mask fades it to nothing toward the
+   middle so copy and product sit on clean white. Static paint, no blur
+   layers, no JS. */
+.hero-grid {
+  background-image: radial-gradient(rgb(0 94 184 / 0.14) 1px, transparent 1.3px);
+  background-size: 26px 26px;
+  mask-image: radial-gradient(ellipse 78% 72% at 50% 42%, transparent 32%, black 80%);
+  -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 42%, transparent 32%, black 80%);
+}
+
+/* Closing CTA band backdrop — CSS grid lines. Replaced a bg-[url('/grid.svg')]
+   that referenced a file which never existed in public/ and 404'd. */
+.cta-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.4) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.4) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 20%, transparent 75%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-marquee {
+    animation: none;
+  }
+
+  .animate-fade-up {
+    animation: none;
+  }
+
+  .js .reveal-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
