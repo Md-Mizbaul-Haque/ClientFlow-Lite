@@ -3,8 +3,8 @@ import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => {
-  const user = { findUnique: vi.fn() };
-  const agency = { create: vi.fn() };
+  const user = { findUnique: vi.fn(), findFirst: vi.fn() };
+  const agency = { create: vi.fn(), findUnique: vi.fn() };
   const refreshToken = { create: vi.fn(), findUnique: vi.fn(), update: vi.fn(), updateMany: vi.fn() };
   const tx = { user: { create: vi.fn() }, agency: { create: vi.fn(), findUnique: vi.fn() } };
   return { user, agency, refreshToken, tx, transaction: vi.fn() };
@@ -46,7 +46,10 @@ const registerBody = {
 
 beforeEach(() => {
   mocks.user.findUnique.mockReset();
+  mocks.user.findFirst.mockReset();
   mocks.agency.create.mockReset();
+  mocks.agency.findUnique.mockReset();
+  mocks.agency.findUnique.mockResolvedValue({ id: "agency_1" });
   mocks.tx.user.create.mockReset();
   mocks.tx.agency.create.mockReset();
   mocks.refreshToken.create.mockReset();
@@ -55,7 +58,11 @@ beforeEach(() => {
   mocks.refreshToken.updateMany.mockReset();
   mocks.transaction.mockReset();
   mocks.transaction.mockImplementation(async (callback: (tx: typeof mocks.tx) => unknown) => callback(mocks.tx));
-  mocks.tx.agency.create.mockResolvedValue({ id: "agency_1", name: registerBody.agencyName });
+  mocks.tx.agency.create.mockImplementation(async (args: { data: { name: string; subdomain: string } }) => ({
+    id: "agency_1",
+    name: args.data.name,
+    subdomain: args.data.subdomain,
+  }));
   mocks.tx.agency.findUnique.mockReset();
   mocks.tx.agency.findUnique.mockResolvedValue(null);
   mocks.tx.user.create.mockResolvedValue({ id: "user_1", email: registerBody.email });
@@ -73,6 +80,7 @@ describe("POST /api/auth/register", () => {
       id: "user_1",
       agencyId: "agency_1",
       agencyName: registerBody.agencyName,
+      subdomain: "designguru-studio",
       email: registerBody.email,
     });
 
@@ -173,22 +181,28 @@ describe("POST /api/auth/register", () => {
 
 describe("POST /api/auth/login", () => {
   async function seedUser(password: string) {
-    mocks.user.findUnique.mockResolvedValue({
+    mocks.user.findFirst.mockResolvedValue({
       id: "user_1",
       agencyId: "agency_1",
       email: registerBody.email,
       passwordHash: await hashPassword(password),
-      agency: { id: "agency_1", name: registerBody.agencyName },
+      agency: { id: "agency_1", name: registerBody.agencyName, subdomain: "designguru-studio" },
     });
   }
 
   it("returns an access token for the right password", async () => {
     await seedUser(registerBody.password);
 
-    const res = await request(app).post("/api/auth/login").send({ email: registerBody.email, password: registerBody.password });
+    const res = await request(app).post("/api/auth/login").send({ subdomain: "designguru-studio", email: registerBody.email, password: registerBody.password });
 
     expect(res.status).toBe(200);
-    expect((res.body as AuthResponse).user.agencyId).toBe("agency_1");
+    expect((res.body as AuthResponse).user).toEqual({
+      id: "user_1",
+      agencyId: "agency_1",
+      agencyName: registerBody.agencyName,
+      subdomain: "designguru-studio",
+      email: registerBody.email,
+    });
     expect((res.body as AuthResponse).accessToken).toBeDefined();
 
     // Refresh token should be created in DB
@@ -201,23 +215,34 @@ describe("POST /api/auth/login", () => {
     await seedUser(registerBody.password);
     const wrongPassword = await request(app)
       .post("/api/auth/login")
-      .send({ email: registerBody.email, password: "not-the-password1" });
+      .send({ subdomain: "designguru-studio", email: registerBody.email, password: "not-the-password1" });
 
-    mocks.user.findUnique.mockResolvedValue(null);
+    mocks.user.findFirst.mockResolvedValue(null);
     const unknownEmail = await request(app)
       .post("/api/auth/login")
-      .send({ email: "nobody@example.com", password: registerBody.password });
+      .send({ subdomain: "designguru-studio", email: "nobody@example.com", password: registerBody.password });
 
     expect(wrongPassword.status).toBe(401);
     expect(unknownEmail.status).toBe(401);
     expect(unknownEmail.body).toEqual(wrongPassword.body);
   });
 
+  it("rejects an unknown workspace without a user lookup", async () => {
+    mocks.agency.findUnique.mockResolvedValue(null);
+
+    const res = await request(app)
+      .post("/api/auth/login")
+      .send({ subdomain: "no-such-studio", email: registerBody.email, password: registerBody.password });
+
+    expect(res.status).toBe(401);
+    expect(mocks.user.findFirst).not.toHaveBeenCalled();
+  });
+
   it("still runs a password compare when the account does not exist", async () => {
-    mocks.user.findUnique.mockResolvedValue(null);
+    mocks.user.findFirst.mockResolvedValue(null);
 
     const started = performance.now();
-    const res = await request(app).post("/api/auth/login").send({ email: "nobody@example.com", password: "whatever1" });
+    const res = await request(app).post("/api/auth/login").send({ subdomain: "designguru-studio", email: "nobody@example.com", password: "whatever1" });
     const elapsed = performance.now() - started;
 
     expect(res.status).toBe(401);
@@ -228,7 +253,8 @@ describe("POST /api/auth/login", () => {
     const res = await request(app).post("/api/auth/login").send({ email: "nobody@example.com", password: "" });
 
     expect(res.status).toBe(400);
-    expect(mocks.user.findUnique).not.toHaveBeenCalled();
+    expect(mocks.agency.findUnique).not.toHaveBeenCalled();
+    expect(mocks.user.findFirst).not.toHaveBeenCalled();
   });
 });
 
@@ -274,7 +300,7 @@ describe("GET /api/auth/me", () => {
       agencyId: "agency_1",
       email: registerBody.email,
       passwordHash: "unused",
-      agency: { id: "agency_1", name: registerBody.agencyName },
+      agency: { id: "agency_1", name: registerBody.agencyName, subdomain: "designguru-studio" },
     });
 
     const res = await request(app)
@@ -286,6 +312,7 @@ describe("GET /api/auth/me", () => {
       id: "user_1",
       agencyId: "agency_1",
       agencyName: registerBody.agencyName,
+      subdomain: "designguru-studio",
       email: registerBody.email,
     });
   });
@@ -306,7 +333,7 @@ describe("GET /api/auth/me", () => {
       agencyId: "agency_1",
       email: registerBody.email,
       passwordHash: "unused",
-      agency: { id: "agency_1", name: registerBody.agencyName },
+      agency: { id: "agency_1", name: registerBody.agencyName, subdomain: "designguru-studio" },
     });
 
     const res = await request(app)

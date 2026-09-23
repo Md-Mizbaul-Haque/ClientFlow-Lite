@@ -76,7 +76,7 @@ router.post("/register", registerLimiter, async (req: Request, res: Response, ne
 
     const passwordHash = await hashPassword(data.password);
 
-    let created: { agency: { id: string; name: string }; user: { id: string; email: string } };
+    let created: { agency: { id: string; name: string; subdomain: string }; user: { id: string; email: string } };
     // The subdomain pre-check can lose a race between check and insert. The
     // unique constraint is the real guarantee: on a subdomain conflict,
     // re-allocate (the taken name is now visible) and retry, a few times.
@@ -127,6 +127,7 @@ router.post("/register", registerLimiter, async (req: Request, res: Response, ne
           id: created.user.id,
           agencyId: created.agency.id,
           agencyName: created.agency.name,
+          subdomain: created.agency.subdomain,
           email: created.user.email,
         },
       }),
@@ -146,10 +147,17 @@ router.post("/login", loginLimiter, async (req: Request, res: Response, next: Ne
 
     const remember = req.body.remember === true;
 
-    const user = await prisma.user.findUnique({
-      where: { email: parsed.data.email },
-      include: { agency: true },
+    // Workspace-scoped: the same email can belong to several agencies, so
+    // the subdomain picks the tenant before the password is checked.
+    const agency = await prisma.agency.findUnique({
+      where: { subdomain: parsed.data.subdomain },
     });
+    const user = agency
+      ? await prisma.user.findFirst({
+          where: { email: parsed.data.email, agencyId: agency.id },
+          include: { agency: true },
+        })
+      : null;
 
     // Always run a bcrypt compare. Short-circuiting on a missing user makes
     // "unknown email" ~100ms faster than "wrong password", which is enough to
@@ -159,7 +167,7 @@ router.post("/login", loginLimiter, async (req: Request, res: Response, next: Ne
 
     if (!user || !passwordOk) {
       logger.warn("auth.login_failed", { email: parsed.data.email, ip: req.ip });
-      res.status(401).json({ status: "error", message: "Invalid email or password" });
+      res.status(401).json({ status: "error", message: "Invalid workspace, email or password" });
       return;
     }
 
@@ -169,7 +177,7 @@ router.post("/login", loginLimiter, async (req: Request, res: Response, next: Ne
       AuthResponseSchema.parse({
         status: "ok",
         accessToken,
-        user: { id: user.id, agencyId: user.agencyId, agencyName: user.agency.name, email: user.email },
+        user: { id: user.id, agencyId: user.agencyId, agencyName: user.agency.name, subdomain: user.agency.subdomain, email: user.email },
       }),
     );
   } catch (err) {
@@ -271,7 +279,7 @@ router.get("/me", requireAuth, async (req: Request, res: Response, next: NextFun
     res.json(
       MeResponseSchema.parse({
         status: "ok",
-        user: { id: user.id, agencyId: user.agencyId, agencyName: user.agency.name, email: user.email },
+        user: { id: user.id, agencyId: user.agencyId, agencyName: user.agency.name, subdomain: user.agency.subdomain, email: user.email },
       }),
     );
   } catch (err) {

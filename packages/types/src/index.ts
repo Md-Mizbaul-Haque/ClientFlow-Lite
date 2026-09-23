@@ -88,6 +88,16 @@ export const UpdateAgencySchema = z
 export type UpdateAgencyInput = z.infer<typeof UpdateAgencySchema>;
 
 export const LoginSchema = z.object({
+  // Workspace disambiguates the account when one email belongs to several
+  // agencies (e.g. a client of multiple studios). Verified against the
+  // agency's allocated subdomain, never user-typed at signup.
+  subdomain: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, "Enter your workspace subdomain")
+    .max(60, "Workspace subdomain is too long")
+    .regex(/^[a-z0-9-]+$/, "Lowercase letters, numbers and hyphens only"),
   email: z.string().trim().toLowerCase().email("Enter a valid email").max(255),
   password: z.string().min(1, "Password is required").max(72, "Password must be 72 characters or fewer"),
 });
@@ -98,6 +108,7 @@ export const AuthUserSchema = z.object({
   id: z.string(),
   agencyId: z.string(),
   agencyName: z.string(),
+  subdomain: z.string(),
   email: z.string(),
 });
 
