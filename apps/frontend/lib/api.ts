@@ -124,6 +124,13 @@ export async function updateAgency(input: UpdateAgencyInput): Promise<void> {
     body: JSON.stringify(input),
   });
   const data = (await res.json().catch(() => null)) as { status?: string; message?: string } | null;
+  // A 401 here means the session died mid-onboarding (the request() refresh
+  // already failed) — surface it as expiry with a login path, never as a
+  // login-password mismatch.
+  if (res.status === 401) {
+    clearSession();
+    throw new SessionExpiredError();
+  }
   if (!res.ok || !data || data.status !== "ok") {
     throw new ApiError(toFriendlyError(res.status, data?.message), res.status);
   }
@@ -145,6 +152,10 @@ export async function requestLogoUpload(contentType: string, size: number): Prom
     status?: string;
     message?: string;
   }) | null;
+  if (res.status === 401) {
+    clearSession();
+    throw new SessionExpiredError();
+  }
   if (!res.ok || !data || data.status !== "ok" || !data.uploadUrl || !data.key || !data.publicUrl) {
     throw new ApiError(toFriendlyError(res.status, data?.message), res.status);
   }

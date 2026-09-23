@@ -2,11 +2,12 @@
 
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ApiError, putLogoFile, requestLogoUpload, updateAgency } from "@/lib/api";
+import { ApiError, putLogoFile, requestLogoUpload, SessionExpiredError, updateAgency } from "@/lib/api";
 import { type FieldErrors } from "@/lib/validation";
 
 const steps = [
@@ -42,6 +43,7 @@ function normalizeWebsite(value: string): string | undefined {
 }
 
 export default function OnboardingPage() {
+  const router = useRouter();
   const [current, setCurrent] = React.useState(1);
   const [brandColor, setBrandColor] = React.useState("#005EB8");
   const [website, setWebsite] = React.useState("");
@@ -78,6 +80,10 @@ export default function OnboardingPage() {
       });
       setCurrent(3);
     } catch (err) {
+      if (err instanceof SessionExpiredError) {
+        router.push("/login");
+        return;
+      }
       if (err instanceof ApiError && err.status === 400) {
         setFormError(err.message);
       } else {
@@ -104,6 +110,10 @@ export default function OnboardingPage() {
       await updateAgency({ logoKey: ticket.key });
       setLogoPreview(ticket.publicUrl);
     } catch (err) {
+      if (err instanceof SessionExpiredError) {
+        router.push("/login");
+        return;
+      }
       setFormError(err instanceof Error ? err.message : "Logo upload failed. Try again or skip this step.");
     } finally {
       setUploading(false);
