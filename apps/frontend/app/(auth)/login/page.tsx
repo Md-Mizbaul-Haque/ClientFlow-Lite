@@ -100,11 +100,8 @@ export default function LoginPage() {
           {errors.password ? <p className="text-xs text-error">{errors.password}</p> : null}
         </div>
 
-        <div className="flex items-center justify-between py-1">
+        <div className="flex items-center py-1">
           <Checkbox checked={remember} onCheckedChange={setRemember} label="Remember Me" />
-          <Link href="#" className="text-sm font-medium text-primary hover:text-primary-hover">
-            Forgot Password
-          </Link>
         </div>
 
         <Button type="submit" variant="primary" disabled={sending}>

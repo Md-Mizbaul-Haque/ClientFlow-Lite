@@ -268,14 +268,7 @@ export default function SignupPage() {
           </div>
 
           <p className="text-center text-xs text-neutral-500">
-            By signing up you agree to our{" "}
-            <Link href="#" className="underline hover:text-neutral-700">
-              Terms and Conditions
-            </Link>{" "}
-            and{" "}
-            <Link href="#" className="underline hover:text-neutral-700">
-              Privacy Policy
-            </Link>
+            By signing up you agree to our Terms and Conditions and Privacy Policy.
           </p>
         </form>
       )}
