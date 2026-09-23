@@ -58,7 +58,7 @@ export default function LoginPage() {
       {/* Header */}
       <div className="flex flex-col gap-2">
         <h1 className="text-[28px] font-bold leading-tight text-neutral-900">Login to your account</h1>
-        <p className="text-sm text-neutral-500">Welcome back — please enter your details.</p>
+        <p className="text-sm text-neutral-500">Welcome back. Please enter your details.</p>
       </div>
 
       {/* Form */}
@@ -126,7 +126,7 @@ export default function LoginPage() {
       </form> 
 
       <p className="text-center text-sm text-neutral-600">
-        You’re new in here?{" "}
+        You’re new here?{" "}
         <Link href="/signup" className="font-medium text-primary hover:text-primary-hover">
           Create Account
         </Link>

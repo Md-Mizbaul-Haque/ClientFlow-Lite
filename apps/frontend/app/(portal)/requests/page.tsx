@@ -21,7 +21,7 @@ export default function RequestsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-bold text-neutral-900">Request queue</h2>
-        <p className="text-sm text-neutral-500">Every client brief in one place — newest first.</p>
+        <p className="text-sm text-neutral-500">Every client brief in one place, newest first.</p>
       </div>
 
       <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by status">

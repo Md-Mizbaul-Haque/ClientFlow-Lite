@@ -323,7 +323,7 @@ export function SearchBar({ onSelect, open: controlledOpen, onOpenChange, onTogg
           ) : (
             <div className="px-4 py-4">
               <p className="text-sm text-neutral-500">Type to search across requests, clients, and invoices.</p>
-              <p className="mt-1.5 text-xs text-neutral-400">Results appear as you type — press Enter to open the top match.</p>
+              <p className="mt-1.5 text-xs text-neutral-400">Results appear as you type. Press Enter to open the top match.</p>
             </div>
           )}
         </div>

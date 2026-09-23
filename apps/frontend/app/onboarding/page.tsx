@@ -23,7 +23,7 @@ export default function OnboardingPage() {
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-neutral-900">Welcome to ClientFlow</h1>
-          <p className="mt-2 text-sm text-neutral-500">Set up your workspace in 3 quick steps — Figma 720 layout, now as wizard.</p>
+          <p className="mt-2 text-sm text-neutral-500">Set up your workspace in 3 quick steps.</p>
         </div>
 
         {/* Stepper — Figma Component 7 style (Completed / In progress / Next) */}
@@ -91,7 +91,7 @@ export default function OnboardingPage() {
                   <div className="h-12 w-12 rounded bg-white border border-border flex items-center justify-center text-xs text-neutral-400">Logo</div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">Upload logo</p>
-                    <p className="text-xs text-neutral-500">PNG, SVG up to 2MB — will appear in your portal header.</p>
+                     <p className="text-xs text-neutral-500">PNG or SVG up to 2MB. It appears in your portal header.</p>
                   </div>
                   <Button variant="secondary">Browse</Button>
                 </div>
@@ -150,7 +150,7 @@ export default function OnboardingPage() {
 
         {/* Footer */}
         <p className="mt-6 text-center text-xs text-neutral-500">
-          Step {current} of 3 — UI only, no backend yet. On finish, data would POST to{" "}
+          Step {current} of 3. UI only, no backend yet. On finish, data would POST to{" "}
           <code className="rounded bg-white px-1 py-0.5 border">/api/agencies/onboard</code>
         </p>
       </div>

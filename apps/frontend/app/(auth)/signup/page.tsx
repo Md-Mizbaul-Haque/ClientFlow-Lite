@@ -111,7 +111,7 @@ export default function SignupPage() {
           {step === 1 ? "Create your account" : "Tell us about your agency"}
         </h1>
         <p className="text-sm text-neutral-500">
-          {step === 1 ? "Start your 14-day free trial — no card required." : "We're almost there."}
+          {step === 1 ? "Start your 14-day free trial. No card required." : "We're almost there."}
         </p>
       </div>
 
@@ -198,7 +198,7 @@ export default function SignupPage() {
 
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center gap-0.5">
-              <label className="text-sm font-medium text-neutral-900">What types of services do you offer?!</label>
+              <label className="text-sm font-medium text-neutral-900">What types of services do you offer?</label>
               <span className="text-error text-sm">*</span>
             </div>
             <select
