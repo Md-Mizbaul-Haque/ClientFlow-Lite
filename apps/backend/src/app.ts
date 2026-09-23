@@ -11,6 +11,7 @@ import authRouter from "./routes/auth.js";
 import healthRouter from "./routes/health.js";
 import searchRouter from "./routes/search.js";
 import notificationsRouter from "./routes/notifications.js";
+import uploadsRouter from "./routes/uploads.js";
 
 export function createApp(): express.Express {
   const app = express();
@@ -38,6 +39,7 @@ app.use("/api/agencies", agenciesRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/notifications", notificationsRouter);
+app.use("/api/uploads", uploadsRouter);
 
   // 404 + error handler must be last
   app.use(notFoundHandler);
