@@ -25,7 +25,8 @@ ClientFlow is a SaaS portal where each tenant (agency/studio) manages its own cl
 
 > **Figma reference:** [Client Portal (Community) — Figma](https://www.figma.com/design/JOvro48pHVwL7FEeOW6i3r/Client-Portal--Community-?node-id=0-1&m=dev&t=BtPMZkJQF0AoaU7L-1)
 
-Figma is the source of truth for layout, components, and tokens (colors, typography, spacing, radii, shadows). Tokens live in `apps/frontend/lib/tokens.ts` and are mapped to `tailwind.config.ts` + `app/globals.css`.
+Figma is the source of truth for layout, components, and tokens (colors, typography, spacing, radii, shadows). Tokens live in `apps/frontend/lib/tokens.ts` and are implemented in `apps/frontend/app/globals.css` (`@theme`, Tailwind v4 CSS-first — there is intentionally no `tailwind.config.ts`).
+
 
 ## Why this stack
 
@@ -67,16 +68,28 @@ pnpm --filter @repo/backend dev   # http://localhost:5000
 - Frontend: http://localhost:3000
 - Backend: http://localhost:5000/api/health  → `{ status: "ok", ... }`
 
+> **Dev and build write to separate output directories.** `next dev` uses
+> `apps/frontend/.next-dev`; `next build` uses `apps/frontend/.next`. Running a
+> build (including `turbo run build`) while a dev server is live no longer wipes
+> that server's CSS. Previously both shared `.next`, so a build deleted
+> `/_next/static/css/app/*.css` out from under the running server and the page
+> loaded unstyled until it restarted. See `apps/frontend/next.config.ts`.
+>
+> Still run **one dev command per app** at a time — two dev servers for the same
+> app share `.next-dev` and can corrupt each other's output.
+
 ## Scripts (root)
 
 | Command | Description |
 |---|---|
 | `pnpm dev` | `turbo run dev` — parallel dev servers |
+| `pnpm dev:frontend` | frontend only — http://localhost:3000 |
+| `pnpm dev:backend` | backend only — http://localhost:5000 |
 | `pnpm build` | `turbo run build` — builds all workspaces |
 | `pnpm lint` | `turbo run lint` |
 | `pnpm type-check` | `turbo run type-check` |
 | `pnpm test` | `turbo run test` — Vitest suites (backend auth, error handling) |
-| `pnpm clean` | cleans `.next`, `dist`, `.turbo` |
+| `pnpm clean` | cleans `.next`, `.next-dev`, `dist`, `.turbo` — **and root `node_modules`**, so run `pnpm install` afterwards |
 
 ## Env Vars
 

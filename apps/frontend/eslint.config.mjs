@@ -4,6 +4,6 @@ import base from "@repo/config-eslint/base.js";
 export default [
   ...base,
   {
-    ignores: [".next/**", "dist/**", "next-env.d.ts"],
+    ignores: [".next/**", ".next-dev/**", "dist/**", "next-env.d.ts"],
   },
 ];

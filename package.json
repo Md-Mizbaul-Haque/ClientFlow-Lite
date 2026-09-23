@@ -7,13 +7,15 @@
     "node": ">=18"
   },
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "pnpm --parallel --filter @repo/frontend --filter @repo/backend dev",
+    "dev:frontend": "pnpm --filter @repo/frontend dev",
+    "dev:backend": "pnpm --filter @repo/backend dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "test": "turbo run test",
-    "clean": "turbo run clean && rimraf node_modules .turbo apps/frontend/.next apps/backend/dist",
-    "clean:force": "rimraf node_modules .turbo apps/frontend/.next apps/frontend/.turbo apps/backend/dist apps/backend/.turbo packages/*/.turbo",
+    "clean": "turbo run clean && rimraf node_modules .turbo apps/frontend/.next apps/frontend/.next-dev apps/backend/dist",
+    "clean:force": "rimraf node_modules .turbo apps/frontend/.next apps/frontend/.next-dev apps/frontend/.turbo apps/backend/dist apps/backend/.turbo packages/*/.turbo",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
   "devDependencies": {

@@ -10,10 +10,12 @@ node_modules
 
 # next.js
 .next
+.next-dev
 out
 build
 dist
 **/.next
+**/.next-dev
 **/dist
 
 # prisma
@@ -52,3 +54,6 @@ coverage/
 *.njsproj
 *.sln
 *.sw?
+
+# local tooling
+.freebuff/
