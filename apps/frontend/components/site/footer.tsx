@@ -7,15 +7,11 @@ const productLinks = [
   { label: "Features", href: "/#services" },
   { label: "Why ClientFlow Lite", href: "/#why" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Client Portal", href: "/client-portal" },
-  { label: "Request Management", href: "/request-management" },
-  { label: "Invoicing", href: "/invoicing" },
 ];
 
 const accountLinks = [
   { label: "Log in", href: "/login" },
   { label: "Create account", href: "/signup" },
-  { label: "Set up workspace", href: "/onboarding" },
 ];
 
 const socialLinks = [
