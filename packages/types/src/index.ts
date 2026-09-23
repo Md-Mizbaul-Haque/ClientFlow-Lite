@@ -18,7 +18,8 @@ export const ApiErrorSchema = z.object({
 
 export type ApiError = z.infer<typeof ApiErrorSchema>;
 
-// Auth — mirrors the 2-step signup UI (account info, then agency profile)
+// Auth — signup takes account info only; the agency profile is collected
+// later in onboarding and saved via UpdateAgencySchema.
 
 export const ServiceTypeSchema = z.enum([
   "Graphic Design Agency",
@@ -51,9 +52,9 @@ export type AccountInfo = z.infer<typeof AccountInfoSchema>;
 
 export const RegisterSchema = AccountInfoSchema.extend({
   website: z.string().trim().max(255).optional(),
-  serviceType: ServiceTypeSchema,
+  serviceType: ServiceTypeSchema.optional(),
   serviceDetail: z.string().trim().max(100).optional(),
-  teamSize: TeamSizeSchema,
+  teamSize: TeamSizeSchema.optional(),
 }).superRefine((data, ctx) => {
     if (data.serviceType === "Other (specify)" && !data.serviceDetail) {
       ctx.addIssue({
@@ -65,6 +66,26 @@ export const RegisterSchema = AccountInfoSchema.extend({
   });
 
 export type RegisterInput = z.infer<typeof RegisterSchema>;
+
+export const UpdateAgencySchema = z
+  .object({
+    website: z.string().trim().max(255).optional(),
+    serviceType: ServiceTypeSchema.optional(),
+    serviceDetail: z.string().trim().max(100).optional(),
+    teamSize: TeamSizeSchema.optional(),
+    logoKey: z.string().trim().min(1).max(500).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.serviceType === "Other (specify)" && !data.serviceDetail) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["serviceDetail"],
+        message: "Describe your agency type",
+      });
+    }
+  });
+
+export type UpdateAgencyInput = z.infer<typeof UpdateAgencySchema>;
 
 export const LoginSchema = z.object({
   email: z.string().trim().toLowerCase().email("Enter a valid email").max(255),
