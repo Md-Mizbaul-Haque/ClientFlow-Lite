@@ -19,6 +19,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [remember, setRemember] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
+  const [subdomain, setSubdomain] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [sending, setSending] = React.useState(false);
@@ -32,7 +33,7 @@ export default function LoginPage() {
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     if (sending) return;
-    const parsed = LoginSchema.safeParse({ email, password });
+    const parsed = LoginSchema.safeParse({ subdomain, email, password });
     if (!parsed.success) {
       setErrors(toFieldErrors(parsed.error));
       return;
@@ -68,6 +69,31 @@ export default function LoginPage() {
             {formError}
           </p>
         ) : null}
+        <div className="flex flex-col gap-2.5">
+          <div className="flex items-center gap-0.5">
+            <label className="text-sm font-medium text-neutral-900">Workspace</label>
+            <span className="text-error text-sm">*</span>
+          </div>
+          {/* Workspace first: the same email can belong to several agencies,
+              so the subdomain picks the tenant before the password is checked. */}
+          <div className={`flex items-center gap-0 rounded-md border bg-white pl-5 h-11 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden ${errors.subdomain ? "border-error" : "border-border"}`}>
+            <span className="shrink-0 text-sm text-neutral-500">https://</span>
+            <input
+              type="text"
+              inputMode="url"
+              autoCapitalize="none"
+              autoCorrect="off"
+              placeholder="your-agency"
+              aria-label="Workspace subdomain"
+              aria-invalid={errors.subdomain !== undefined}
+              value={subdomain}
+              onChange={(e) => { setSubdomain(e.target.value.toLowerCase()); clearError("subdomain"); }}
+              className="h-full min-w-0 flex-1 bg-transparent px-1 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
+            />
+            <span className="shrink-0 pr-5 text-sm text-neutral-500 whitespace-nowrap">.clientflowlite.com</span>
+          </div>
+          {errors.subdomain ? <p className="text-xs text-error">{errors.subdomain}</p> : null}
+        </div>
         <Input label="Email" requiredMark placeholder="Input your registered email" type="email" value={email} error={errors.email} onChange={(e) => { setEmail(e.target.value); clearError("email"); }} />
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center gap-0.5">

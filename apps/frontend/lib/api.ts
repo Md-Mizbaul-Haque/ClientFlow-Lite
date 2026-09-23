@@ -99,7 +99,7 @@ async function postAuth(
 // Server messages are written for people, not programmers. Anything technical
 // that slips through (zod internals, status codes) is replaced here.
 function toFriendlyError(status: number, serverMessage?: string): string {
-  if (status === 401) return "That email and password do not match. Check for typos and try again.";
+  if (status === 401) return "That workspace, email and password do not match. Check for typos and try again.";
   if (status === 409) return "An account with this email already exists. Try logging in instead.";
   if (serverMessage && !/^invalid input/i.test(serverMessage) && !/failed \(\d+\)/i.test(serverMessage)) {
     return serverMessage;

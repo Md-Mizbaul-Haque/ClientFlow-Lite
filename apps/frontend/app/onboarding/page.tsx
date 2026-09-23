@@ -7,7 +7,7 @@ import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ApiError, putLogoFile, requestLogoUpload, SessionExpiredError, updateAgency } from "@/lib/api";
+import { ApiError, getMe, putLogoFile, requestLogoUpload, SessionExpiredError, updateAgency } from "@/lib/api";
 import { type FieldErrors } from "@/lib/validation";
 
 const steps = [
@@ -54,6 +54,25 @@ export default function OnboardingPage() {
   const [uploading, setUploading] = React.useState(false);
   const [formError, setFormError] = React.useState<string | null>(null);
   const [errors, setErrors] = React.useState<FieldErrors>({});
+  // Workspace identity comes from the signed-in account (allocated at
+  // signup), never typed here — step 1 displays it, it collects nothing.
+  const [workspaceName, setWorkspaceName] = React.useState("");
+  const [workspaceSubdomain, setWorkspaceSubdomain] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    getMe()
+      .then((user) => {
+        setWorkspaceName(user.agencyName);
+        setWorkspaceSubdomain(user.subdomain);
+      })
+      .catch((err) => {
+        if (err instanceof SessionExpiredError) {
+          router.push("/login");
+          return;
+        }
+        setFormError(err instanceof Error ? err.message : "Could not load your workspace");
+      });
+  }, [router]);
 
   function clearError(key: string) {
     setErrors((prev) => (prev[key] === undefined ? prev : { ...prev, [key]: undefined }));
@@ -165,6 +184,19 @@ export default function OnboardingPage() {
           {current === 1 && (
             <div className="flex flex-col gap-6">
               <h2 className="text-lg font-semibold text-neutral-900">Agency profile</h2>
+              <div className="rounded-md border border-border bg-neutral-50 px-5 py-3 text-sm text-neutral-700">
+                {workspaceSubdomain ? (
+                  <>
+                    Setting up <span className="font-semibold text-neutral-900">{workspaceName}</span>
+                    {" — portal address "}
+                    <span className="font-mono text-[13px]">
+                      https://{workspaceSubdomain}.clientflowlite.com
+                    </span>
+                  </>
+                ) : (
+                  "Loading workspace…"
+                )}
+              </div>
               {formError ? (
                 <p role="alert" className="rounded-md border border-error bg-[#FDECEC] px-4 py-3 text-sm text-error">
                   {formError}
