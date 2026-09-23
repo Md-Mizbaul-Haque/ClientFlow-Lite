@@ -220,15 +220,28 @@ input:autofill {
   opacity: 1;
 }
 
-/* Closing CTA band backdrop — CSS grid lines. Replaced a bg-[url('/grid.svg')]
-   that referenced a file which never existed in public/ and 404'd. */
-.cta-grid {
+/* Closing CTA band backdrop — clean at rest, subtle grid on hover only.
+   .cta-spot paints faint grid lines plus a soft white glow, both clipped to
+   a small circle around --mx/--my (written by cta-background.tsx). Off by
+   default and parked offscreen until the first pointermove, so there is no
+   flash and no visible grid until hover. */
+.cta-spot {
+  opacity: 0;
+  transition: opacity 0.35s ease;
   background-image:
-    linear-gradient(to right, rgb(255 255 255 / 0.4) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(255 255 255 / 0.4) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 20%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 20%, transparent 75%);
+    radial-gradient(220px circle at var(--mx, -300px) var(--my, -300px), rgb(255 255 255 / 0.12), transparent 70%),
+    linear-gradient(to right, rgb(255 255 255 / 0.38) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.38) 1px, transparent 1px);
+  background-size:
+    auto,
+    48px 48px,
+    48px 48px;
+  mask-image: radial-gradient(220px circle at var(--mx, -300px) var(--my, -300px), black 25%, transparent 70%);
+  -webkit-mask-image: radial-gradient(220px circle at var(--mx, -300px) var(--my, -300px), black 25%, transparent 70%);
+}
+
+.cta-canvas.has-spot .cta-spot {
+  opacity: 1;
 }
 
 /* Pricing page header backdrop — same grid language as .cta-grid, drawn in
@@ -263,6 +276,10 @@ input:autofill {
   }
 
   .hero-spot {
+    display: none;
+  }
+
+  .cta-spot {
     display: none;
   }
 }

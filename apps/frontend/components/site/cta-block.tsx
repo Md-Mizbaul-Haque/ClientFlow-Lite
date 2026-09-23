@@ -1,13 +1,12 @@
 import Link from "next/link";
 
+import { CtaBackground } from "@/components/site/cta-background";
 import { Reveal } from "@/components/site/reveal";
 
 export function CtaBlock() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-hover to-primary-deep py-20">
-      {/* CSS-drawn grid. The previous bg-[url('/grid.svg')] requested a file
-          that does not exist in public/ and 404'd on every page load. */}
-      <div aria-hidden="true" className="cta-grid absolute inset-0 opacity-10" />
+      <CtaBackground />
       <div className="relative mx-auto max-w-4xl px-6 text-center lg:px-8">
         <Reveal>
         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
