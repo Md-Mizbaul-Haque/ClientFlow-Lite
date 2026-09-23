@@ -11,10 +11,9 @@ import { ApiError, putLogoFile, requestLogoUpload, SessionExpiredError, updateAg
 import { type FieldErrors } from "@/lib/validation";
 
 const steps = [
-  { id: 1, title: "Workspace", desc: "Agency name & subdomain" },
-  { id: 2, title: "Agency profile", desc: "Website, type & size" },
-  { id: 3, title: "Branding", desc: "Logo & colors" },
-  { id: 4, title: "Services", desc: "First service" },
+  { id: 1, title: "Agency profile", desc: "Website, type & size" },
+  { id: 2, title: "Branding", desc: "Logo & colors" },
+  { id: 3, title: "Services", desc: "First service" },
 ];
 
 const SERVICE_OPTIONS = [
@@ -78,7 +77,7 @@ export default function OnboardingPage() {
         serviceDetail: service === "Other (specify)" ? serviceDetail.trim() : undefined,
         teamSize: teamSize as "1-5" | "6-20" | "21-50" | "50+",
       });
-      setCurrent(3);
+      setCurrent(2);
     } catch (err) {
       if (err instanceof SessionExpiredError) {
         router.push("/login");
@@ -126,7 +125,7 @@ export default function OnboardingPage() {
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-neutral-900">Welcome to ClientFlow</h1>
-          <p className="mt-2 text-sm text-neutral-500">Set up your workspace in 4 quick steps.</p>
+          <p className="mt-2 text-sm text-neutral-500">Set up your workspace in 3 quick steps.</p>
         </div>
 
         {/* Stepper — Figma Component 7 style (Completed / In progress / Next) */}
@@ -164,28 +163,6 @@ export default function OnboardingPage() {
         {/* Card */}
         <div className="rounded-lg border border-neutral-100 bg-white p-6 sm:p-8">
           {current === 1 && (
-            <div className="flex flex-col gap-6">
-              <h2 className="text-lg font-semibold text-neutral-900">Workspace details</h2>
-              <Input label="Agency Name" requiredMark placeholder="e.g. DesignGuru Studio" />
-              <div className="flex flex-col gap-2.5">
-                <div className="flex items-center gap-0.5">
-                  <label className="text-sm font-medium text-neutral-900">Subdomain</label>
-                  <span className="text-error text-sm">*</span>
-                </div>
-                <div className="flex items-center gap-2.5 rounded-md border border-border bg-white px-5 h-11 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
-                  <input placeholder="your-agency" className="flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none" />
-                  <span className="text-sm text-neutral-500 whitespace-nowrap">.myclone.com</span>
-                </div>
-                <p className="text-xs text-neutral-500">You can add a custom domain later (CNAME).</p>
-              </div>
-              <div className="flex justify-between pt-2">
-                <div />
-                <Button onClick={() => setCurrent(2)}>Continue</Button>
-              </div>
-            </div>
-          )}
-
-          {current === 2 && (
             <div className="flex flex-col gap-6">
               <h2 className="text-lg font-semibold text-neutral-900">Agency profile</h2>
               {formError ? (
@@ -273,9 +250,7 @@ export default function OnboardingPage() {
               </fieldset>
 
               <div className="flex justify-between pt-2">
-                <Button variant="secondary" onClick={() => setCurrent(1)} disabled={saving}>
-                  Back
-                </Button>
+                <div />
                 <Button onClick={handleProfileContinue} disabled={saving}>
                   {saving ? "Saving…" : "Continue"}
                 </Button>
@@ -283,7 +258,7 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {current === 3 && (
+          {current === 2 && (
             <div className="flex flex-col gap-6">
               <h2 className="text-lg font-semibold text-neutral-900">Branding</h2>
               {formError ? (
@@ -330,15 +305,15 @@ export default function OnboardingPage() {
                 <p className="text-xs text-neutral-500">Used for primary buttons, links, and portal header.</p>
               </div>
               <div className="flex justify-between pt-2">
-                <Button variant="secondary" onClick={() => setCurrent(2)}>
+                <Button variant="secondary" onClick={() => setCurrent(1)}>
                   Back
                 </Button>
-                <Button onClick={() => setCurrent(4)} disabled={uploading}>Continue</Button>
+                <Button onClick={() => setCurrent(3)} disabled={uploading}>Continue</Button>
               </div>
             </div>
           )}
 
-          {current === 4 && (
+          {current === 3 && (
             <div className="flex flex-col gap-6">
               <h2 className="text-lg font-semibold text-neutral-900">Create your first service</h2>
               <Input label="Service Name" requiredMark placeholder='e.g. "Logo Design"' />
@@ -353,7 +328,7 @@ export default function OnboardingPage() {
               </div>
               <Input label="Description" placeholder="What does this service include?" />
               <div className="flex justify-between pt-2">
-                <Button variant="secondary" onClick={() => setCurrent(3)}>
+                <Button variant="secondary" onClick={() => setCurrent(2)}>
                   Back
                 </Button>
                 <Link href="/dashboard">
@@ -369,7 +344,7 @@ export default function OnboardingPage() {
 
         {/* Footer */}
         <p className="mt-6 text-center text-xs text-neutral-500">
-          Step {current} of 4. Steps 2–3 save to your agency; the rest is UI only. On finish, data would POST to{" "}
+          Step {current} of 3. Steps 1–2 save to your agency; the rest is UI only. On finish, data would POST to{" "}
           <code className="rounded bg-white px-1 py-0.5 border">/api/agencies/onboard</code>
         </p>
       </div>
