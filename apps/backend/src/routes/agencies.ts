@@ -5,6 +5,7 @@ import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import { logger } from "../lib/logger.js";
 import { getAuth, requireAuth } from "../middleware/auth.js";
+import { authedWriteLimiter } from "../middleware/rate-limit.js";
 
 const router = Router();
 
@@ -13,7 +14,7 @@ function firstIssueMessage(error: { issues: Array<{ message: string }> }): strin
 }
 
 // PATCH /api/agencies/me — save the agency profile collected in onboarding.
-router.patch("/me", requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+router.patch("/me", requireAuth, authedWriteLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const parsed = UpdateAgencySchema.safeParse(req.body);
     if (!parsed.success) {

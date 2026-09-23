@@ -29,3 +29,14 @@ export const refreshLimiter = rateLimit({
   legacyHeaders: false,
   message: { status: "error", message: "Too many refresh attempts. Please try again later." },
 });
+
+// Authenticated write guard: 100 requests per 15 minutes per IP. Covers
+// agency profile writes and logo URL minting — without it one authed
+// client could loop presigned-URL minting into an S3 cost vector.
+export const authedWriteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { status: "error", message: "Too many requests. Please try again later." },
+});

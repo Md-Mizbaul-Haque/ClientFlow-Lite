@@ -5,6 +5,7 @@ import type { NextFunction, Request, Response } from "express";
 import { extensionFor, presignedLogoUpload } from "../lib/s3.js";
 import { logger } from "../lib/logger.js";
 import { getAuth, requireAuth } from "../middleware/auth.js";
+import { authedWriteLimiter } from "../middleware/rate-limit.js";
 
 const router = Router();
 
@@ -18,7 +19,7 @@ const LogoRequestSchema = z.object({
 // POST /api/uploads/logo — mint a presigned PUT URL for an agency logo.
 // The browser uploads straight to the bucket; the key is saved via
 // PATCH /api/agencies/me.
-router.post("/logo", requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+router.post("/logo", requireAuth, authedWriteLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const parsed = LogoRequestSchema.safeParse(req.body);
     if (!parsed.success || !extensionFor(parsed.data.contentType)) {

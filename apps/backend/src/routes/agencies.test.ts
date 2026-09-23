@@ -54,6 +54,15 @@ describe("PATCH /api/agencies/me", () => {
     expect(res.status).toBe(400);
   });
 
+  it("rate-limits profile writes", async () => {
+    const statuses: number[] = [];
+    for (let i = 0; i < 120; i++) {
+      const res = await request(app).patch("/api/agencies/me").set(auth).send({ teamSize: "1-5" });
+      statuses.push(res.status);
+    }
+    expect(statuses).toContain(429);
+  }, 60000);
+
   it("leaves the register route mounted and responding", async () => {
     // This file mocks only prisma.agency, so register cannot complete here;
     // the strict 409 case lives in auth.test.ts (kept green by Task 3).
