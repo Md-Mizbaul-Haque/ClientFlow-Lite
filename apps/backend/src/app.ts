@@ -6,6 +6,7 @@ import morgan from "morgan";
 
 import { env } from "./lib/env.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.js";
+import agenciesRouter from "./routes/agencies.js";
 import authRouter from "./routes/auth.js";
 import healthRouter from "./routes/health.js";
 import searchRouter from "./routes/search.js";
@@ -33,6 +34,7 @@ export function createApp(): express.Express {
   });
 
 app.use("/api/health", healthRouter);
+app.use("/api/agencies", agenciesRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/notifications", notificationsRouter);
