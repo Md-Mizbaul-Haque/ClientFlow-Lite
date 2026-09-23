@@ -177,8 +177,8 @@ input:autofill {
 .hero-canvas {
   background-color: #ffffff;
   background-image:
-    radial-gradient(ellipse 52% 46% at 74% 44%, rgb(107 162 214 / 0.34), transparent 68%),
-    radial-gradient(ellipse 60% 50% at 4% 2%, rgb(0 94 184 / 0.1), transparent 62%),
+    radial-gradient(ellipse 52% 46% at 74% 44%, rgb(107 162 214 / 0.52), transparent 68%),
+    radial-gradient(ellipse 60% 50% at 4% 2%, rgb(0 94 184 / 0.18), transparent 62%),
     linear-gradient(to bottom, #f6f9fc 0%, #ffffff 62%);
 }
 
@@ -186,17 +186,38 @@ input:autofill {
    8-bit displays without it. Self-contained SVG turbulence, no image file. */
 .hero-grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.035;
+  opacity: 0.06;
 }
 
 /* Dot grid for the hero edges. Radial mask fades it to nothing toward the
    middle so copy and product sit on clean white. Static paint, no blur
-   layers, no JS. */
+   layers. */
 .hero-grid {
-  background-image: radial-gradient(rgb(0 94 184 / 0.14) 1px, transparent 1.3px);
+  background-image: radial-gradient(rgb(0 94 184 / 0.26) 1px, transparent 1.3px);
   background-size: 26px 26px;
   mask-image: radial-gradient(ellipse 78% 72% at 50% 42%, transparent 32%, black 80%);
   -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 42%, transparent 32%, black 80%);
+}
+
+/* Cursor spotlight for the hero dots. Same 26px rhythm as .hero-grid but
+   painted bolder, plus a soft brand glow — both clipped to a circle around
+   --mx/--my (written by hero-background.tsx). Off by default and parked
+   offscreen until the first pointermove, so there is no flash. */
+.hero-spot {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background-image:
+    radial-gradient(320px circle at var(--mx, -300px) var(--my, -300px), rgb(0 94 184 / 0.16), transparent 70%),
+    radial-gradient(rgb(0 94 184 / 0.55) 1.4px, transparent 1.7px);
+  background-size:
+    auto,
+    26px 26px;
+  mask-image: radial-gradient(240px circle at var(--mx, -300px) var(--my, -300px), black 30%, transparent 72%);
+  -webkit-mask-image: radial-gradient(240px circle at var(--mx, -300px) var(--my, -300px), black 30%, transparent 72%);
+}
+
+.hero-canvas.has-spot .hero-spot {
+  opacity: 1;
 }
 
 /* Closing CTA band backdrop — CSS grid lines. Replaced a bg-[url('/grid.svg')]
@@ -208,6 +229,18 @@ input:autofill {
   background-size: 48px 48px;
   mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 20%, transparent 75%);
   -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 20%, transparent 75%);
+}
+
+/* Pricing page header backdrop — same grid language as .cta-grid, drawn in
+   the brand primary (#005eb8) at low alpha for light surfaces. The radial
+   mask fades it toward the edges so copy stays on clean white. */
+.pricing-grid {
+  background-image:
+    linear-gradient(to right, rgb(0 94 184 / 0.2) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(0 94 184 / 0.2) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 75% 75% at 50% 40%, black 30%, transparent 88%);
+  -webkit-mask-image: radial-gradient(ellipse 75% 75% at 50% 40%, black 30%, transparent 88%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -227,5 +260,9 @@ input:autofill {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  .hero-spot {
+    display: none;
   }
 }
