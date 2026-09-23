@@ -76,9 +76,9 @@ router.post("/register", registerLimiter, async (req: Request, res: Response, ne
             data: {
               name: data.agencyName,
               website: data.website ? data.website : null,
-              serviceType: data.serviceType,
+              serviceType: data.serviceType ?? null,
               serviceDetail: data.serviceDetail ? data.serviceDetail : null,
-              teamSize: data.teamSize,
+              teamSize: data.teamSize ?? null,
             },
           });
           const user = await tx.user.create({

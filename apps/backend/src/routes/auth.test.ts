@@ -111,6 +111,24 @@ describe("POST /api/auth/register", () => {
     expect(mocks.transaction).not.toHaveBeenCalled();
   });
 
+  it("creates an account-only agency when profile fields are omitted", async () => {
+    const res = await request(app).post("/api/auth/register").send({
+      agencyName: "Fresh Studio",
+      email: "owner@freshstudio.com",
+      password: "supersecret1",
+    });
+
+    expect(res.status).toBe(201);
+    expect(mocks.tx.agency.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        name: "Fresh Studio",
+        website: null,
+        serviceType: null,
+        teamSize: null,
+      }),
+    });
+  });
+
   it("does not leak an unexpected database failure", async () => {
     mocks.transaction.mockRejectedValueOnce(new Error('relation "Agency" does not exist'));
 
