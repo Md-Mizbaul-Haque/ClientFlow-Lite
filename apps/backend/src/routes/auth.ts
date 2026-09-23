@@ -8,6 +8,7 @@ import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jw
 import { logger } from "../lib/logger.js";
 import { comparePassword, exceedsBcryptLimit, getDecoyPasswordHash, hashPassword } from "../lib/password.js";
 import { prisma } from "../lib/prisma.js";
+import { allocateSubdomain } from "../lib/slug.js";
 import { getAuth, requireAuth } from "../middleware/auth.js";
 import { loginLimiter, refreshLimiter, registerLimiter } from "../middleware/rate-limit.js";
 
@@ -24,6 +25,13 @@ function firstIssueMessage(error: { issues: Array<{ message: string }> }): strin
  *  generated-client path change can't turn a 409 into a 500. */
 function isUniqueConstraintError(err: unknown): boolean {
   return typeof err === "object" && err !== null && (err as { code?: unknown }).code === "P2002";
+}
+
+/** P2002 against the subdomain key — a lost allocation race, worth one retry. */
+function isSubdomainConflict(err: unknown): boolean {
+  if (typeof err !== "object" || err === null) return false;
+  const { code, meta } = err as { code?: unknown; meta?: { target?: unknown } };
+  return code === "P2002" && Array.isArray(meta?.target) && meta.target.includes("subdomain");
 }
 
 function setRefreshCookie(res: Response, token: string, remember: boolean): void {
@@ -69,35 +77,44 @@ router.post("/register", registerLimiter, async (req: Request, res: Response, ne
     const passwordHash = await hashPassword(data.password);
 
     let created: { agency: { id: string; name: string }; user: { id: string; email: string } };
-    try {
-      created = await prisma.$transaction(
-        async (tx) => {
-          const agency = await tx.agency.create({
-            data: {
-              name: data.agencyName,
-              website: data.website ? data.website : null,
-              serviceType: data.serviceType ?? null,
-              serviceDetail: data.serviceDetail ? data.serviceDetail : null,
-              teamSize: data.teamSize ?? null,
-            },
-          });
-          const user = await tx.user.create({
-            data: {
-              agencyId: agency.id,
-              email: data.email,
-              passwordHash,
-            },
-          });
-          return { agency, user };
-        },
-        { maxWait: 10000, timeout: 20000 },
-      );
-    } catch (err) {
-      if (isUniqueConstraintError(err)) {
-        res.status(409).json({ status: "error", message: "Email already registered" });
-        return;
+    // The subdomain pre-check can lose a race between check and insert. The
+    // unique constraint is the real guarantee: on a subdomain conflict,
+    // re-allocate (the taken name is now visible) and retry, a few times.
+    for (let attempt = 1; ; attempt++) {
+      try {
+        created = await prisma.$transaction(
+          async (tx) => {
+            const subdomain = await allocateSubdomain(tx, data.agencyName);
+            const agency = await tx.agency.create({
+              data: {
+                name: data.agencyName,
+                subdomain,
+                website: data.website ? data.website : null,
+                serviceType: data.serviceType ?? null,
+                serviceDetail: data.serviceDetail ? data.serviceDetail : null,
+                teamSize: data.teamSize ?? null,
+              },
+            });
+            const user = await tx.user.create({
+              data: {
+                agencyId: agency.id,
+                email: data.email,
+                passwordHash,
+              },
+            });
+            return { agency, user };
+          },
+          { maxWait: 10000, timeout: 20000 },
+        );
+        break;
+      } catch (err) {
+        if (isSubdomainConflict(err) && attempt < 3) continue;
+        if (isUniqueConstraintError(err)) {
+          res.status(409).json({ status: "error", message: "Email already registered" });
+          return;
+        }
+        throw err;
       }
-      throw err;
     }
 
     const accessToken = await issueTokens(res, created.user.id, created.agency.id, remember);

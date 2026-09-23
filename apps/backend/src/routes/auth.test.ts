@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => {
   const user = { findUnique: vi.fn() };
   const agency = { create: vi.fn() };
   const refreshToken = { create: vi.fn(), findUnique: vi.fn(), update: vi.fn(), updateMany: vi.fn() };
-  const tx = { user: { create: vi.fn() }, agency: { create: vi.fn() } };
+  const tx = { user: { create: vi.fn() }, agency: { create: vi.fn(), findUnique: vi.fn() } };
   return { user, agency, refreshToken, tx, transaction: vi.fn() };
 });
 
@@ -56,6 +56,8 @@ beforeEach(() => {
   mocks.transaction.mockReset();
   mocks.transaction.mockImplementation(async (callback: (tx: typeof mocks.tx) => unknown) => callback(mocks.tx));
   mocks.tx.agency.create.mockResolvedValue({ id: "agency_1", name: registerBody.agencyName });
+  mocks.tx.agency.findUnique.mockReset();
+  mocks.tx.agency.findUnique.mockResolvedValue(null);
   mocks.tx.user.create.mockResolvedValue({ id: "user_1", email: registerBody.email });
   mocks.refreshToken.create.mockResolvedValue({ id: "rt_1", userId: "user_1", token: "tok_1" });
 });
@@ -126,6 +128,36 @@ describe("POST /api/auth/register", () => {
         serviceType: null,
         teamSize: null,
       }),
+    });
+  });
+
+  it("derives the subdomain from the agency name", async () => {
+    const res = await request(app).post("/api/auth/register").send({
+      agencyName: "Fresh Studio",
+      email: "owner@freshstudio.com",
+      password: "supersecret1",
+    });
+
+    expect(res.status).toBe(201);
+    expect(mocks.tx.agency.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ subdomain: "fresh-studio" }),
+    });
+  });
+
+  it("suffixes the subdomain when the base is taken", async () => {
+    mocks.tx.agency.findUnique
+      .mockResolvedValueOnce({ id: "other_agency" })
+      .mockResolvedValue(null);
+
+    const res = await request(app).post("/api/auth/register").send({
+      agencyName: "Fresh Studio",
+      email: "owner@freshstudio.com",
+      password: "supersecret1",
+    });
+
+    expect(res.status).toBe(201);
+    expect(mocks.tx.agency.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ subdomain: "fresh-studio-2" }),
     });
   });
 
