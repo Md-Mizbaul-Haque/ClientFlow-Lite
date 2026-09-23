@@ -81,15 +81,23 @@ const faqs = [
   },
 ];
 
-function CheckIcon({ included }: { included: boolean }) {
-  return included ? (
-    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10">
-      <Check size={12} className="text-primary" />
-    </div>
-  ) : (
-    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-100">
-      <Minus size={12} className="text-neutral-400" />
-    </div>
+function CheckIcon({ included, label }: { included: boolean; label: string }) {
+  return (
+    <span
+      title={included ? `Included in ${label}` : `Not included in ${label}`}
+      className={`mx-auto flex h-5 w-5 items-center justify-center rounded-full ${
+        included ? "bg-primary/10" : "bg-neutral-100"
+      }`}
+    >
+      {included ? (
+        <Check size={12} className="text-primary" aria-hidden="true" />
+      ) : (
+        <Minus size={12} className="text-neutral-400" aria-hidden="true" />
+      )}
+      <span className="sr-only">
+        {included ? `Included in ${label}` : `Not included in ${label}`}
+      </span>
+    </span>
   );
 }
 
@@ -102,6 +110,7 @@ export default function PricingPage() {
 
       {/* Header */}
       <section className="relative overflow-hidden bg-gradient-to-b from-primary-soft via-white to-white">
+        <div aria-hidden="true" className="pricing-grid absolute inset-0" />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="flex flex-col items-center py-16 text-center sm:py-20">
             <span className="animate-fade-up rounded-full border border-border bg-white px-4 py-1.5 text-sm font-medium text-primary shadow-sm">
@@ -137,45 +146,134 @@ export default function PricingPage() {
       </section>
 
       {/* Comparison Table */}
-      <section className="mx-auto max-w-7xl px-6 lg:px-8 pb-20">
+      <section className="mx-auto max-w-5xl px-6 lg:px-8 pb-20">
         <h2 className="text-center text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
           Plan comparison
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-center text-neutral-600">
-          See what&apos;s included in each plan.
+          Everything in Pro is included in Team. Team adds collaboration,
+          branding, and integrations.
         </p>
-        <div className="mt-12 overflow-x-auto">
-          <table className="w-full min-w-[600px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="pb-4 pr-4 font-medium text-neutral-500">Feature</th>
-                <th className="pb-4 px-4 text-center font-semibold text-neutral-900">Pro</th>
-                <th className="pb-4 pl-4 text-center font-semibold text-primary">Team</th>
-              </tr>
-            </thead>
-            <tbody>
-              {comparisonFeatures.map((group) => (
-                <Fragment key={group.category}>
-                  <tr key={group.category}>
-                    <td colSpan={3} className="pb-2 pt-8 text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                      {group.category}
-                    </td>
-                  </tr>
-                  {group.features.map((f) => (
-                    <tr key={f.name} className="border-b border-border/60">
-                      <td className="py-3.5 pr-4 text-neutral-700">{f.name}</td>
-                      <td className="py-3.5 px-4 text-center">
-                        <CheckIcon included={f.pro} />
-                      </td>
-                      <td className="py-3.5 pl-4 text-center">
-                        <CheckIcon included={f.team} />
-                      </td>
-                    </tr>
-                  ))}
-                </Fragment>
-              ))}
-            </tbody>
-          </table>
+
+        <div className="mt-12 overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+              <caption className="sr-only">
+                Feature comparison between Pro and Team plans
+              </caption>
+              <thead>
+                <tr className="border-b border-border">
+                  <th
+                    scope="col"
+                    className="w-[46%] px-6 py-5 text-sm font-medium text-neutral-500"
+                  >
+                    Feature
+                  </th>
+                  <th scope="col" className="w-[27%] px-4 py-5 text-center">
+                    <span className="block text-base font-semibold text-neutral-900">
+                      Pro
+                    </span>
+                    <span className="mt-0.5 block text-xs font-normal text-neutral-500">
+                      $29/mo
+                    </span>
+                  </th>
+                  <th
+                    scope="col"
+                    className="w-[27%] border-l border-border/60 bg-primary/[0.04] px-4 py-5 text-center"
+                  >
+                    <span className="mx-auto mb-1.5 block w-fit rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                      Most popular
+                    </span>
+                    <span className="block text-base font-semibold text-primary">
+                      Team
+                    </span>
+                    <span className="mt-0.5 block text-xs font-normal text-neutral-500">
+                      $79/mo
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparisonFeatures.map((group) => {
+                  const proCount = group.features.filter((f) => f.pro).length;
+                  const total = group.features.length;
+                  return (
+                    <Fragment key={group.category}>
+                      <tr className="border-t border-border/60 bg-neutral-50/70 first:border-t-0">
+                        <td colSpan={3} className="px-6 py-3">
+                          <span className="flex flex-wrap items-center justify-between gap-2">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                              {group.category}
+                            </span>
+                            <span className="text-xs font-medium text-neutral-400">
+                              Pro {proCount}/{total} · Team {total}/{total}
+                            </span>
+                          </span>
+                        </td>
+                      </tr>
+                      {group.features.map((f) => (
+                        <tr
+                          key={f.name}
+                          className="border-t border-border/60 transition-colors hover:bg-neutral-50/60"
+                        >
+                          <th
+                            scope="row"
+                            className="px-6 py-3.5 font-normal text-neutral-700"
+                          >
+                            {f.name}
+                          </th>
+                          <td className="px-4 py-3.5 text-center">
+                            <CheckIcon included={f.pro} label="Pro" />
+                          </td>
+                          <td className="border-l border-border/60 bg-primary/[0.04] px-4 py-3.5 text-center">
+                            <CheckIcon included={f.team} label="Team" />
+                          </td>
+                        </tr>
+                      ))}
+                    </Fragment>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr className="border-t border-border bg-neutral-50/50">
+                  <td className="px-6 py-5 text-sm font-medium text-neutral-900">
+                    Choose your plan
+                  </td>
+                  <td className="px-4 py-5 text-center">
+                    <Link
+                      href="/signup"
+                      className="inline-block rounded-lg border border-border bg-white px-5 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-50"
+                    >
+                      Start with Pro
+                    </Link>
+                  </td>
+                  <td className="border-l border-border/60 bg-primary/[0.04] px-4 py-5 text-center">
+                    <Link
+                      href="/signup"
+                      className="inline-block rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                    >
+                      Start with Team
+                    </Link>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-neutral-500">
+          <span className="inline-flex items-center gap-2">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10">
+              <Check size={12} className="text-primary" aria-hidden="true" />
+            </span>
+            Included
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-100">
+              <Minus size={12} className="text-neutral-400" aria-hidden="true" />
+            </span>
+            Not included in this plan
+          </span>
         </div>
       </section>
 
