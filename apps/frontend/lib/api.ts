@@ -1,5 +1,5 @@
 import { MeResponseSchema } from "@repo/types";
-import type { AuthResponse, AuthUser, LoginInput, RegisterInput } from "@repo/types";
+import type { AuthResponse, AuthUser, LoginInput, RegisterInput, UpdateAgencyInput } from "@repo/types";
 
 import { clearSession, getToken, saveSession } from "./session";
 
@@ -115,6 +115,50 @@ export function register(input: RegisterInput): Promise<AuthResponse> {
 
 export function login(input: LoginInput, remember: boolean): Promise<AuthResponse> {
   return postAuth("/api/auth/login", { ...input, remember });
+}
+
+export async function updateAgency(input: UpdateAgencyInput): Promise<void> {
+  const res = await request("/api/agencies/me", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  const data = (await res.json().catch(() => null)) as { status?: string; message?: string } | null;
+  if (!res.ok || !data || data.status !== "ok") {
+    throw new ApiError(toFriendlyError(res.status, data?.message), res.status);
+  }
+}
+
+export interface LogoUploadTicket {
+  uploadUrl: string;
+  key: string;
+  publicUrl: string;
+}
+
+export async function requestLogoUpload(contentType: string, size: number): Promise<LogoUploadTicket> {
+  const res = await request("/api/uploads/logo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ contentType, size }),
+  });
+  const data = (await res.json().catch(() => null)) as (Partial<LogoUploadTicket> & {
+    status?: string;
+    message?: string;
+  }) | null;
+  if (!res.ok || !data || data.status !== "ok" || !data.uploadUrl || !data.key || !data.publicUrl) {
+    throw new ApiError(toFriendlyError(res.status, data?.message), res.status);
+  }
+  return { uploadUrl: data.uploadUrl, key: data.key, publicUrl: data.publicUrl };
+}
+
+export async function putLogoFile(uploadUrl: string, file: File): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+  } catch {
+    throw new ApiError(CONNECT_ERROR, 0);
+  }
+  if (!res.ok) throw new ApiError("Logo upload failed. Try a smaller file and try again.", res.status);
 }
 
 export class SessionExpiredError extends ApiError {
